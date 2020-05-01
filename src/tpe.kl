@@ -1,0 +1,83 @@
+PROGRAM TPE
+%NOLOCKGROUP
+
+%INCLUDE tpe.klt
+%INCLUDE tpe.klh
+%INCLUDE errors.klh
+
+BEGIN
+END TPE
+
+
+-- #########
+-- Get TPE arguments
+-- #########
+
+-- Return int LS argument value
+ROUTINE GET_INT_AR
+VAR
+  data_type  : INTEGER
+  int_value  : INTEGER
+  real_value : REAL
+  string_value : STRING[30]
+  STATUS     : INTEGER
+  
+BEGIN
+  data_type = Type_INTEGER
+  
+  GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
+  IF STATUS = NOPARAM THEN
+      WRITE('Parameter AR[', reg_no ,'] does not exist.')
+  ENDIF
+  CHK_STAT(STATUS)
+  
+  RETURN(int_value)
+  
+END GET_INT_AR
+
+-- Return real LS argument value
+ROUTINE GET_REAL_AR
+VAR
+  data_type  : INTEGER
+  int_value  : INTEGER
+  real_value : REAL
+  string_value : STRING[30]
+  STATUS     : INTEGER
+  
+BEGIN
+  data_type = Type_REAL
+  
+  GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
+  IF (real_value = 0) AND (int_value <> 0) THEN
+    real_value = int_value
+  ENDIF
+  IF STATUS = NOPARAM THEN
+      WRITE('Parameter AR[', reg_no ,'] does not exist.')
+  ENDIF
+  CHK_STAT(STATUS)
+  
+  RETURN(real_value)
+  
+END GET_REAL_AR
+
+-- get LS string argument
+ROUTINE GET_STR_AR
+VAR
+  data_type  : INTEGER
+  int_value  : INTEGER
+  real_value : REAL
+  string_value : STRING[30]
+  STATUS     : INTEGER
+  
+BEGIN
+  data_type = Type_STRING
+  
+  GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
+  IF STATUS = NOPARAM THEN
+      WRITE('Parameter AR[', reg_no ,'] does not exist.')
+  ENDIF
+  
+  CHK_STAT(STATUS)
+  
+  RETURN(string_value)
+END GET_STR_AR

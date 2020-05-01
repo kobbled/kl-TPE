@@ -1,0 +1,9 @@
+%ifndef tpe_h
+%define tpe_h
+
+--get AR variables from TPE file
+ROUTINE GET_INT_AR(reg_no : INTEGER) : INTEGER FROM tpe
+ROUTINE GET_REAL_AR(reg_no : INTEGER) : REAL FROM tpe
+ROUTINE GET_STR_AR(reg_no : INTEGER) : STRING FROM tpe
+
+%endif --tpe_h

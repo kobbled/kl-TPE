@@ -1,0 +1,16 @@
+%include define_type.m
+
+%mode push
+%mode string QQQ "`" "`" "\\"
+%define hash_type_define `TYPE
+  -- 8 Bytes
+  TPEPROGRAMS FROM tpe = STRUCTURE
+    open_id : INTEGER
+    status : INTEGER
+  ENDSTRUCTURE`
+%mode pop
+
+--declare hash for TPEPROGRAMS
+%defeval hashname tpelog
+%defeval hval_def TPEPROGRAMS
+%defeval hval_type TPEPROGRAMS

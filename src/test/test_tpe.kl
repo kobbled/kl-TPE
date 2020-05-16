@@ -1,0 +1,9 @@
+PROGRAM test_tpe
+%NOLOCKGROUP
+
+%INCLUDE tpe.klh
+%INCLUDE kunit.klh
+
+
+BEGIN
+END test_tpe

@@ -1,9 +1,36 @@
 %ifndef tpe_h
 %define tpe_h
 
+%include namespace.m
+
+%define prog_name tpe
+%define prog_name_alias tpe
+
+declare(prog_name,open,prog_name_alias,open)
+declare(prog_name,close,prog_name_alias,close)
+declare(prog_name,constructor,prog_name_alias,cstr)
+declare(prog_name,destructor,prog_name_alias,dsct)
+declare(prog_name,get_int_arg,prog_name_alias,gtargi)
+declare(prog_name,get_real_arg,prog_name_alias,gtargr)
+declare(prog_name,get_string_arg,prog_name_alias,gtargs)
+declare(prog_name,get_pose_data,prog_name_alias,getpose)
+declare(prog_name,get_last_pose,prog_name_alias,lastpos)
+declare(prog_name,get_poses,prog_name_alias,getposes)
+
+-- handlers
+ROUTINE tpe__constructor FROM tpe
+ROUTINE tpe__destructor FROM tpe
+ROUTINE tpe__open(TPE_name : STRING) FROM tpe
+ROUTINE tpe__close(TPE_name : STRING) FROM tpe
+
 --get AR variables from TPE file
-ROUTINE GET_INT_AR(reg_no : INTEGER) : INTEGER FROM tpe
-ROUTINE GET_REAL_AR(reg_no : INTEGER) : REAL FROM tpe
-ROUTINE GET_STR_AR(reg_no : INTEGER) : STRING FROM tpe
+ROUTINE tpe__get_int_arg(reg_no : INTEGER) : INTEGER FROM tpe
+ROUTINE tpe__get_real_arg(reg_no : INTEGER) : REAL FROM tpe
+ROUTINE tpe__get_string_arg(reg_no : INTEGER) : STRING FROM tpe
+
+--retrieve pose data
+ROUTINE tpe__get_pose_data(TPE_name : STRING; pose_no, grp_no : INTEGER; pose : POSEDATA) : BOOLEAN FROM tpe
+ROUTINE tpe__get_last_pose(TPE_name : STRING; grp_no : INTEGER) : INTEGER FROM tpe
+ROUTINE tpe__get_poses(TPE_name : STRING; poses : PATH NODEDATA = TURNTABLE) : BOOLEAN FROM tpe
 
 %endif --tpe_h

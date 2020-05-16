@@ -12,6 +12,11 @@
     "include"
   ],
   "depends" : [
-    "errors"
+    "pose",
+    "files",
+    "errors",
+    "Hash",
+    "KUnit",
+    "ktransw-macros"
   ]
 }

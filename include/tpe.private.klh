@@ -1,0 +1,19 @@
+%ifndef tpe_private_h
+%define tpe_private_h
+
+%include namespace.m
+
+%define prog_name tpe
+%define prog_name_alias tpe
+
+declare(prog_name,check_if_open,prog_name_alias,chkopen)
+declare(prog_name,get_pose_grp,prog_name_alias,getgrpp)
+declare(prog_name,get_pose_turntable,prog_name_alias,gtptrn)
+
+--retrieve openid if open
+ROUTINE tpe__check_if_open(TPE_name : STRING) : hval_type FROM tpe
+-- get pose of a specified group
+ROUTINE tpe__get_pose_grp(open_id :INTEGER; pose_no, grp_no : INTEGER; pose : POSEDATA) : BOOLEAN FROM tpe
+-- local get pose method without opening or closing
+ROUTINE tpe__get_pose_turntable(open_id :INTEGER; pose_no: INTEGER; grp_mask : INTEGER; pose : TURNTABLE) : BOOLEAN FROM tpe
+%endif --tpe_private_h

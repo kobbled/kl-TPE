@@ -1,0 +1,19 @@
+%ifndef tpe_pose_h
+%define tpe_pose_h
+
+%include namespace.m
+
+%define prog_name tpe
+%define prog_name_alias tpe
+
+
+declare(prog_name,get_pose_data,prog_name_alias,getpose)
+declare(prog_name,get_last_pose,prog_name_alias,lastpos)
+declare(prog_name,get_poses,prog_name_alias,getposes)
+
+--retrieve pose data
+ROUTINE tpe__get_pose_data(TPE_name : STRING; pose_no, grp_no : INTEGER; pose : POSEDATA) : BOOLEAN FROM tpelib
+ROUTINE tpe__get_last_pose(TPE_name : STRING; grp_no : INTEGER) : INTEGER FROM tpelib
+ROUTINE tpe__get_poses(TPE_name : STRING; poses : PATH NODEDATA = TURNTABLE) : BOOLEAN FROM tpelib
+
+%endif --tpe_pose_h

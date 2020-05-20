@@ -6,22 +6,13 @@
 %include pose.const.klt
 %include errors.klt
 
-CONST
-  Type_INTEGER  = 1
-  Type_REAL     = 2
-  Type_STRING   = 3
-  NOPARAM       = 17042 -- TPE Parameter does not exist 
-  INVALIDTYPE   = 17043 -- invalid data type
-  TPE_NOPARAM       = 17042 -- TPE Parameter does not exist
-  TPE_POSE_UNINIT   =  17038 -- Uninitialized TPE position
-  MAX_POINTS = 3000  -- max points to search through
-
 --statuses for TPEPROGRAMS
 %include files.klt
 
-CONST
-  TPE_IS_CLOSED = 99999
-  TPE_IS_OPEN = 80000
+%include tpe.const.klt
+%include tpe.type.klt
 
+VAR
+  prgm_stats : ARRAY[10] OF hashname
 
 %endif --tpe_t 

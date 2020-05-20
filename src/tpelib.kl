@@ -1,7 +1,5 @@
-PROGRAM TPE
+PROGRAM tpelib
 %NOLOCKGROUP
-
-%include tpe.klt
 
 -- USER STRUCT
 %include hash_tpeprog.klt
@@ -11,26 +9,20 @@ hash_type_define
 
 t_hash(hashname,hval_def,hashtpe)
 
-VAR
-  prgm_stats : ARRAY[10] OF hashname
+%include tpe.klt
 
---define position storage types
-TYPE
-  TURNTABLE FROM tpe = STRUCTURE
-    robot_cart: XYZWPR
-    robot_jnt: JOINTPOS6
-    rotary: JOINTPOS2
-  ENDSTRUCTURE
+%include errors.klh
+%include pose.klh
 
 %include tpe.private.klh
+%include tpe_pose.klh
 %include tpe.klh
-%include errors.klh
 
 -- h_prgstat
 %class hashtpe('hash.klc','hashclass.klh','hash_tpeprog.klt')
 
 BEGIN
-END TPE
+END tpelib
 
 -- *** PRIVATE ***
 ROUTINE tpe__check_if_open
@@ -100,7 +92,7 @@ ROUTINE tpe__get_pose_turntable
         IF b1 AND UNINIT(p.joint) THEN
           pose.robot_cart = p.xyz
         ELSE IF b1 AND UNINIT(p.xyz) THEN
-          pose.robot_jnt = p.joint
+          pose.robot_jnt = pose__jpos_to_jpos6(p.joint)
         ENDIF
         ENDIF
     ENDSELECT
@@ -111,17 +103,23 @@ ROUTINE tpe__get_pose_turntable
       CASE (2,3) :
         b2 = tpe__get_pose_grp(open_id, pose_no, 2, p)
         --assume joint representation
-        IF b2 THEN pose.rotary = p.joint ; ENDIF
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
       --group 3
       CASE (4,5) :
         b2 = tpe__get_pose_grp(open_id, pose_no, 3, p)
         --assume joint representation
-        IF b2 THEN pose.rotary = p.joint ; ENDIF
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
       --group 4
       CASE (8,9) :
         b2 = tpe__get_pose_grp(open_id, pose_no, 4, p)
         --assume joint representation
-        IF b2 THEN pose.rotary = p.joint ; ENDIF
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
     ENDSELECT
 
     --OR op b1, and b2. Will return false if it didn't retrieve either

@@ -1,0 +1,13 @@
+%ifndef tpe_type_t
+%define tpe_t
+
+--define position storage types
+TYPE
+  TURNTABLE FROM tpe = STRUCTURE
+    robot_cart: XYZWPR
+    robot_jnt: JOINTPOS
+    rotary: JOINTPOS
+  ENDSTRUCTURE
+
+
+%endif --tpe_type_t 

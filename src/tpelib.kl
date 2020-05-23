@@ -316,7 +316,7 @@ ROUTINE tpe__get_last_pose
     FOR i = last_pose TO end_pose DO
       GET_POS_TYP(p_stat.open_id, i, grp_no, posn_typ, num_axs, status)
       --check if status returns uninitialized
-      IF status <> TPE_POSE_UNINIT THEN
+      IF status <> TPE_P_UNINIT THEN
         b = TRUE
         GOTO END_SRCH
       ENDIF

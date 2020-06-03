@@ -220,6 +220,9 @@ ROUTINE tpe__get_int_arg
     IF STATUS = NOPARAM THEN
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
     ENDIF
+    IF data_type <> 1 THEN
+      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
+    ENDIF
     CHK_STAT(STATUS)
     
     RETURN(int_value)
@@ -242,6 +245,9 @@ ROUTINE tpe__get_real_arg
     GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
     IF (real_value = 0) AND (int_value <> 0) THEN
       real_value = int_value
+    ENDIF
+    IF data_type = 3  THEN
+      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not a number', ER_ABORT)
     ENDIF
     IF STATUS = NOPARAM THEN
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
@@ -268,6 +274,9 @@ ROUTINE tpe__get_string_arg
     GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
     IF STATUS = NOPARAM THEN
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
+    ENDIF
+    IF data_type <> 3 THEN
+      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not a string', ER_ABORT)
     ENDIF
     
     CHK_STAT(STATUS)

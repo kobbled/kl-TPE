@@ -15,6 +15,7 @@
     "pose",
     "files",
     "errors",
+    "Strings",
     "Hash",
     "KUnit",
     "ktransw-macros"

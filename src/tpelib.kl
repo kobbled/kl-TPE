@@ -12,6 +12,7 @@ t_hash(hashname,hval_def,hashtpe)
 %include tpe.klt
 
 %include errors.klh
+%include strings.klh
 %include pose.klh
 
 %include tpe.private.klh
@@ -176,7 +177,7 @@ ROUTINE tpe__open
     ENDIF
 
     b = hashtpe__put(TPE_name, p_stat, 'tpe', 'prgm_stats')
-    IF NOT b THEN karelError('Could not write '+ TPE_name + ' to "prgm_stats" in TPE', ER_ABORT) ; ENDIF
+    IF NOT b THEN karelError(INVALID_INDEX, 'Could not write '+ TPE_name + ' to "prgm_stats" in TPE', ER_ABORT) ; ENDIF
 
   END tpe__open 
 
@@ -188,7 +189,7 @@ ROUTINE tpe__close
   BEGIN
     -- get openid if it exists
     b = hashtpe__get(TPE_name, p_stat, 'tpe', 'prgm_stats')
-    IF NOT b THEN karelError( TPE_name + ' does not appear to be open.', ER_WARN) ; ENDIF
+    IF NOT b THEN karelError(TPE_UPDATE_FAILED, TPE_name + ' does not appear to be open.', ER_WARN) ; ENDIF
     --close if program foudn in log
     IF b THEN
       --close tpe program
@@ -221,7 +222,7 @@ ROUTINE tpe__get_int_arg
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
     ENDIF
     IF data_type <> 1 THEN
-      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
+      karelError(EXPECTED_INT, 'TPE arguement ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
     ENDIF
     CHK_STAT(STATUS)
     
@@ -247,7 +248,7 @@ ROUTINE tpe__get_real_arg
       real_value = int_value
     ENDIF
     IF data_type = 3  THEN
-      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not a number', ER_ABORT)
+      karelError(EXPECTED_REAL, 'TPE arguement ' + i_to_s(reg_no) + ' is not a number', ER_ABORT)
     ENDIF
     IF STATUS = NOPARAM THEN
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
@@ -276,7 +277,7 @@ ROUTINE tpe__get_string_arg
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
     ENDIF
     IF data_type <> 3 THEN
-      karelError('TPE arguement ' + i_to_s(reg_no) + ' is not a string', ER_ABORT)
+      karelError(INVALID_STRING, 'TPE arguement ' + i_to_s(reg_no) + ' is not a string', ER_ABORT)
     ENDIF
     
     CHK_STAT(STATUS)

@@ -222,7 +222,7 @@ ROUTINE tpe__get_int_arg
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
     ENDIF
     IF data_type <> 1 THEN
-      karelError(EXPECTED_INT, 'TPE arguement ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
+      karelError(EXPECTED_INT, 'TPE argument ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
     ENDIF
     CHK_STAT(STATUS)
     
@@ -248,7 +248,7 @@ ROUTINE tpe__get_real_arg
       real_value = int_value
     ENDIF
     IF data_type = 3  THEN
-      karelError(EXPECTED_REAL, 'TPE arguement ' + i_to_s(reg_no) + ' is not a number', ER_ABORT)
+      karelError(EXPECTED_REAL, 'TPE argument ' + i_to_s(reg_no) + ' is not a number', ER_ABORT)
     ENDIF
     IF STATUS = NOPARAM THEN
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
@@ -277,7 +277,7 @@ ROUTINE tpe__get_string_arg
         WRITE('Parameter AR[', reg_no ,'] does not exist.')
     ENDIF
     IF data_type <> 3 THEN
-      karelError(INVALID_STRING, 'TPE arguement ' + i_to_s(reg_no) + ' is not a string', ER_ABORT)
+      karelError(INVALID_STRING, 'TPE argument ' + i_to_s(reg_no) + ' is not a string', ER_ABORT)
     ENDIF
     
     CHK_STAT(STATUS)

@@ -6,14 +6,13 @@
 %define prog_name tpe
 %define prog_name_alias tpe
 
-declare(prog_name,check_if_open,prog_name_alias,chkopen)
-declare(prog_name,get_pose_grp,prog_name_alias,getgrpp)
-declare(prog_name,get_pose_turntable,prog_name_alias,gtptrn)
-
 --retrieve openid if open
+declare_function(prog_name,check_if_open,prog_name_alias,chkopen)
 ROUTINE tpe__check_if_open(TPE_name : STRING) : hval_type FROM tpelib
 -- get pose of a specified group
+declare_function(prog_name,get_pose_grp,prog_name_alias,getgrpp)
 ROUTINE tpe__get_pose_grp(open_id :INTEGER; pose_no, grp_no : INTEGER; pose : POSEDATA) : BOOLEAN FROM tpelib
 -- local get pose method without opening or closing
+declare_function(prog_name,get_pose_turntable,prog_name_alias,gtptrn)
 ROUTINE tpe__get_pose_turntable(open_id :INTEGER; pose_no: INTEGER; grp_mask : INTEGER; pose : TURNTABLE) : BOOLEAN FROM tpelib
 %endif --tpe_private_h

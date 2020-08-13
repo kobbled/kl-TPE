@@ -6,23 +6,22 @@
 %define prog_name tpe
 %define prog_name_alias tpe
 
-declare(prog_name,open,prog_name_alias,open)
-declare(prog_name,close,prog_name_alias,close)
-declare(prog_name,constructor,prog_name_alias,cstr)
-declare(prog_name,destructor,prog_name_alias,dsct)
-declare(prog_name,get_int_arg,prog_name_alias,gtargi)
-declare(prog_name,get_real_arg,prog_name_alias,gtargr)
-declare(prog_name,get_string_arg,prog_name_alias,gtargs)
-
 -- handlers
+declare_function(prog_name,constructor,prog_name_alias,cstr)
 ROUTINE tpe__constructor FROM tpelib
+declare_function(prog_name,destructor,prog_name_alias,dsct)
 ROUTINE tpe__destructor FROM tpelib
+declare_function(prog_name,open,prog_name_alias,open)
 ROUTINE tpe__open(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,close,prog_name_alias,close)
 ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
 
 --get AR variables from TPE file
+declare_function(prog_name,get_int_arg,prog_name_alias,gtargi)
 ROUTINE tpe__get_int_arg(reg_no : INTEGER) : INTEGER FROM tpelib
+declare_function(prog_name,get_real_arg,prog_name_alias,gtargr)
 ROUTINE tpe__get_real_arg(reg_no : INTEGER) : REAL FROM tpelib
+declare_function(prog_name,get_string_arg,prog_name_alias,gtargs)
 ROUTINE tpe__get_string_arg(reg_no : INTEGER) : STRING FROM tpelib
 
 %endif --tpe_h

@@ -11,9 +11,9 @@ t_hash(hashname,hval_def,hashtpe)
 
 %include tpe.klt
 
-%include errors.klh
-%include strings.klh
-%include pose.klh
+%from errors.klh %import CHK_STAT, karelError 
+%from strings.klh %import i_to_s
+%from pose.klh %import jpos_to_jpos6, jpos_to_jpos2
 
 %include tpe.private.klh
 %include tpe_pose.klh

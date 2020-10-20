@@ -1,8 +1,6 @@
 %ifndef tpe_t
 %define tpe_t
 
-%include pose.type.klt
-
 %include pose.const.klt
 %include errors.klt
 

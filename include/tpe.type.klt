@@ -9,5 +9,10 @@ TYPE
     rotary: JOINTPOS
   ENDSTRUCTURE
 
+  POSEDATA FROM tpe = STRUCTURE
+		t_xyz : XYZWPR
+    t_joint : JOINTPOS
+	ENDSTRUCTURE
+
 
 %endif --tpe_type_t 

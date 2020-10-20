@@ -58,13 +58,13 @@ ROUTINE tpe__get_pose_grp
       -- cartesian rep
       CASE (CC_POSITION,CC_XYZWPR,CC_EXT) :
         -- get cartesian representation
-        pose.xyz = GET_POS_TPE(open_id, pose_no, status, grp_no)
+        pose.t_xyz = GET_POS_TPE(open_id, pose_no, status, grp_no)
         CHK_STAT(status)
         IF status <> 0 THEN RETURN(FALSE) ; ENDIF
       -- joint rep
       CASE (CC_JOINT) :
         -- get joint represenation of posreg
-        pose.joint = GET_JPOS_TPE(open_id, pose_no, status, grp_no)
+        pose.t_joint = GET_JPOS_TPE(open_id, pose_no, status, grp_no)
         CHK_STAT(status)
         IF status <> 0 THEN RETURN(FALSE) ; ENDIF
     ENDSELECT
@@ -90,10 +90,10 @@ ROUTINE tpe__get_pose_turntable
         --get robot pose
         b1 = tpe__get_pose_grp(open_id, pose_no, 1, p)
         -- variability as to whether pose is cartesion or joint
-        IF b1 AND UNINIT(p.joint) THEN
-          pose.robot_cart = p.xyz
-        ELSE IF b1 AND UNINIT(p.xyz) THEN
-          pose.robot_jnt = pose__jpos_to_jpos6(p.joint)
+        IF b1 AND UNINIT(p.t_joint) THEN
+          pose.robot_cart = p.t_xyz
+        ELSE IF b1 AND UNINIT(p.t_xyz) THEN
+          pose.robot_jnt = pose__jpos_to_jpos6(p.t_joint)
         ENDIF
         ENDIF
     ENDSELECT
@@ -105,21 +105,21 @@ ROUTINE tpe__get_pose_turntable
         b2 = tpe__get_pose_grp(open_id, pose_no, 2, p)
         --assume joint representation
         IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
         ENDIF
       --group 3
       CASE (4,5) :
         b2 = tpe__get_pose_grp(open_id, pose_no, 3, p)
         --assume joint representation
         IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
         ENDIF
       --group 4
       CASE (8,9) :
         b2 = tpe__get_pose_grp(open_id, pose_no, 4, p)
         --assume joint representation
         IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
         ENDIF
     ENDSELECT
 

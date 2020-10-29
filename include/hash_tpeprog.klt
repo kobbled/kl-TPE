@@ -2,9 +2,9 @@
 
 %mode push
 %mode string QQQ "`" "`" "\\"
-%define hash_type_define `TYPE
+%define hash_type_define(obj_name) `TYPE
   -- 8 Bytes
-  TPEPROGRAMS FROM tpe = STRUCTURE
+  TPEPROGRAMS FROM obj_name = STRUCTURE
     open_id : INTEGER
     status : INTEGER
   ENDSTRUCTURE`

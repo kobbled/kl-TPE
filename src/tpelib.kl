@@ -4,7 +4,7 @@ PROGRAM tpelib
 -- USER STRUCT
 %include hash_tpeprog.klt
 --print type found in hashtypetest.klt
-hash_type_define
+hash_type_define(hashtpe)
 %undef hash_type_define
 
 t_hash(hashname,hval_def,hashtpe)

@@ -13,11 +13,12 @@
   ],
   "depends" : [
     "pose",
-    "files",
     "errors",
     "Strings",
     "Hash",
-    "KUnit",
     "ktransw-macros"
+  ],
+  "tests-depends" : [
+    "KUnit"
   ]
 }

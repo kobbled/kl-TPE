@@ -211,7 +211,7 @@ ROUTINE tpe__get_int_arg
     data_type  : INTEGER
     int_value  : INTEGER
     real_value : REAL
-    string_value : STRING[30]
+    string_value : STRING[1]
     STATUS     : INTEGER
     
   BEGIN
@@ -237,7 +237,7 @@ ROUTINE tpe__get_real_arg
     data_type  : INTEGER
     int_value  : INTEGER
     real_value : REAL
-    string_value : STRING[30]
+    string_value : STRING[1]
     STATUS     : INTEGER
     
   BEGIN
@@ -266,7 +266,7 @@ ROUTINE tpe__get_string_arg
     data_type  : INTEGER
     int_value  : INTEGER
     real_value : REAL
-    string_value : STRING[30]
+    string_value : STRING[32]
     STATUS     : INTEGER
     
   BEGIN
@@ -284,6 +284,32 @@ ROUTINE tpe__get_string_arg
     
     RETURN(string_value)
   END tpe__get_string_arg
+
+ROUTINE tpe__get_boolean_arg
+  VAR
+    data_type  : INTEGER
+    int_value  : INTEGER
+    real_value : REAL
+    string_value : STRING[1]
+    STATUS     : INTEGER
+  BEGIN
+    data_type = Type_INTEGER
+    
+    GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
+    IF STATUS = NOPARAM THEN
+        WRITE('Parameter AR[', reg_no ,'] does not exist.')
+    ENDIF
+    IF data_type <> 1 THEN
+      karelError(EXPECTED_INT, 'TPE argument ' + i_to_s(reg_no) + ' is not an integer', ER_ABORT)
+    ENDIF
+    CHK_STAT(STATUS)
+
+    IF (int_value = 0) THEN
+      RETURN(FALSE)
+    ENDIF
+    
+    RETURN(TRUE)
+  END tpe__get_boolean_arg
 
 --retrieve pose data
 --******************

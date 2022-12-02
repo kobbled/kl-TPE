@@ -23,5 +23,7 @@ declare_function(prog_name,get_real_arg,prog_name_alias,gtargr)
 ROUTINE tpe__get_real_arg(reg_no : INTEGER) : REAL FROM tpelib
 declare_function(prog_name,get_string_arg,prog_name_alias,gtargs)
 ROUTINE tpe__get_string_arg(reg_no : INTEGER) : STRING FROM tpelib
+declare_function(prog_name,get_boolean_arg,prog_name_alias,gtargb)
+ROUTINE tpe__get_boolean_arg(reg_no : INTEGER) : BOOLEAN FROM tpelib
 
 %endif --tpe_h

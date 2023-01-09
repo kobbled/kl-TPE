@@ -213,7 +213,6 @@ ROUTINE tpe__get_int_arg
     real_value : REAL
     string_value : STRING[1]
     STATUS     : INTEGER
-    
   BEGIN
     data_type = Type_INTEGER
     
@@ -239,7 +238,6 @@ ROUTINE tpe__get_real_arg
     real_value : REAL
     string_value : STRING[1]
     STATUS     : INTEGER
-    
   BEGIN
     data_type = Type_REAL
     
@@ -268,7 +266,6 @@ ROUTINE tpe__get_string_arg
     real_value : REAL
     string_value : STRING[32]
     STATUS     : INTEGER
-    
   BEGIN
     data_type = Type_STRING
     
@@ -310,6 +307,22 @@ ROUTINE tpe__get_boolean_arg
     
     RETURN(TRUE)
   END tpe__get_boolean_arg
+
+ROUTINE tpe__parameter_exists
+  VAR
+    data_type  : INTEGER
+    int_value  : INTEGER
+    real_value : REAL
+    string_value : STRING[32]
+    STATUS     : INTEGER
+  BEGIN
+    GET_TPE_PRM(reg_no, data_type, int_value, real_value, string_value, STATUS)
+    IF STATUS = NOPARAM THEN
+      RETURN(FALSE)
+    ELSE
+      RETURN(TRUE)
+    ENDIF
+  END tpe__parameter_exists
 
 --retrieve pose data
 --******************

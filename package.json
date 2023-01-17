@@ -6,10 +6,14 @@
   "license" : "MIT",
   "author" : "kobbled",
   "source" : [
-    "src/tpelib.kl"
+    "lib/tpefile/tpelib.kl"
   ],
   "includes" : [
-    "include"
+    "lib/tpefile",
+    "lib/tpepose"
+  ],
+  "tests" : [
+    "test/test_tpe_ls.tpp"
   ],
   "depends" : [
     "pose",

@@ -1,0 +1,12 @@
+%ifndef tpe_private_h
+%define tpe_private_h
+
+%include namespace.m
+
+%define prog_name tpe
+%define prog_name_alias tpe
+
+--retrieve openid if open
+declare_function(prog_name,check_if_open,prog_name_alias,chkopen)
+ROUTINE tpe__check_if_open(TPE_name : STRING) : hval_type FROM tpelib
+%endif --tpe_private_h

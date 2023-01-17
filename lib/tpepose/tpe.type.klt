@@ -1,0 +1,20 @@
+%ifndef tpe_type_t
+%define tpe_t
+
+--define position storage types
+TYPE
+  t_ROTARY FROM tpe = JOINTPOS2
+
+  t_NODE FROM tpe = STRUCTURE
+    xyz: XYZWPREXT IN GROUP[1]
+    joint: JOINTPOS IN GROUP[1]
+    rotary: t_ROTARY
+  ENDSTRUCTURE
+
+  t_POSEDATA FROM tpe = STRUCTURE
+		xyz : XYZWPREXT
+    joint : JOINTPOS
+	ENDSTRUCTURE
+
+
+%endif --tpe_type_t 

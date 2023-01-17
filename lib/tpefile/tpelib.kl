@@ -43,92 +43,6 @@ ROUTINE tpe__check_if_open
     RETURN(p_stat)
   END tpe__check_if_open
 
-ROUTINE tpe__get_pose_grp
-  VAR
-    posn_typ, num_axs : INTEGER
-    p_stat : hval_type
-    status : INTEGER
-  BEGIN
-    -- get pose type
-    GET_POS_TYP(open_id, pose_no, grp_no, posn_typ, num_axs, status)
-    CHK_STAT(status)
-    IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-
-    SELECT posn_typ OF
-      -- cartesian rep
-      CASE (CC_POSITION,CC_XYZWPR,CC_EXT) :
-        -- get cartesian representation
-        pose.t_xyz = GET_POS_TPE(open_id, pose_no, status, grp_no)
-        CHK_STAT(status)
-        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-      -- joint rep
-      CASE (CC_JOINT) :
-        -- get joint represenation of posreg
-        pose.t_joint = GET_JPOS_TPE(open_id, pose_no, status, grp_no)
-        CHK_STAT(status)
-        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-    ENDSELECT
-
-    RETURN(TRUE)
-  END tpe__get_pose_grp
-
-
-ROUTINE tpe__get_pose_turntable
-  VAR
-    b1, b2 : BOOLEAN
-    p : POSEDATA
-  BEGIN
-    --group mask decimal corresponds with (gp1,gp2,gp3,gp4)
-    --1000 = 1 : 0100 = 2  : 0010 = 4  : 0001 = 8
-    --           1100 = 3  : 1010 = 5  : 1001 = 9
-    --           1110 = 7  : 1110 = 7  : 1011 = 13
-    --                     : 1011 = 13 :
-
-    --assume robot is on group 1
-    SELECT grp_mask OF
-      CASE (1,3,5,7,9,11,13) :
-        --get robot pose
-        b1 = tpe__get_pose_grp(open_id, pose_no, 1, p)
-        -- variability as to whether pose is cartesion or joint
-        IF b1 AND UNINIT(p.t_joint) THEN
-          pose.robot_cart = p.t_xyz
-        ELSE IF b1 AND UNINIT(p.t_xyz) THEN
-          pose.robot_jnt = pose__jpos_to_jpos6(p.t_joint)
-        ENDIF
-        ENDIF
-    ENDSELECT
-
-    --get rotary group
-    SELECT grp_mask OF
-      --group 2
-      CASE (2,3) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 2, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
-        ENDIF
-      --group 3
-      CASE (4,5) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 3, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
-        ENDIF
-      --group 4
-      CASE (8,9) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 4, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.t_joint) ;
-        ENDIF
-    ENDSELECT
-
-    --OR op b1, and b2. Will return false if it didn't retrieve either
-    RETURN(b1 OR b2)
-
-  END tpe__get_pose_turntable
-  
-
 
 -- *** PUBLIC ***
 
@@ -346,24 +260,92 @@ ROUTINE tpe__parameter_exists
     ENDIF
   END tpe__parameter_exists
 
---retrieve pose data
---******************
+--position getters
+-- ------------------
 
-ROUTINE tpe__get_pose_data
+ROUTINE tpe__get_pose_grp
   VAR
     posn_typ, num_axs : INTEGER
     p_stat : hval_type
-    b : BOOLEAN
+    status : INTEGER
   BEGIN
-    --open tpe if its not open
-    p_stat = tpe__check_if_open(TPE_name)
-    --try and retrieve pose
-    b = tpe__get_pose_grp(p_stat.open_id, pose_no, grp_no, pose)
-    --if pos was not retrieved b = FALSE
-    RETURN(b)
-  END tpe__get_pose_data
+    -- get pose type
+    GET_POS_TYP(open_id, pose_no, grp_no, posn_typ, num_axs, status)
+    CHK_STAT(status)
+    IF status <> 0 THEN RETURN(FALSE) ; ENDIF
 
-ROUTINE tpe__get_last_pose
+    SELECT posn_typ OF
+      -- cartesian rep
+      CASE (CC_POSITION,CC_XYZWPR,CC_EXT) :
+        -- get cartesian representation
+        pose.xyz = GET_POS_TPE(open_id, pose_no, status, grp_no)
+        CHK_STAT(status)
+        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
+      -- joint rep
+      CASE (CC_JOINT) :
+        -- get joint represenation of posreg
+        pose.joint = GET_JPOS_TPE(open_id, pose_no, status, grp_no)
+        CHK_STAT(status)
+        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
+    ENDSELECT
+
+    RETURN(TRUE)
+  END tpe__get_pose_grp
+
+
+ROUTINE tpe__get_pose
+  VAR
+    b1, b2 : BOOLEAN
+    p : t_POSEDATA
+  BEGIN
+    --group mask decimal corresponds with (gp1,gp2,gp3,gp4)
+    --1000 = 1 : 0100 = 2  : 0010 = 4  : 0001 = 8
+    --           1100 = 3  : 1010 = 5  : 1001 = 9
+    --           1110 = 7  : 1110 = 7  : 1011 = 13
+    --                     : 1011 = 13 :
+
+    --assume robot is on group 1
+    --get robot pose
+    b1 = tpe__get_pose_grp(open_id, pose_no, 1, p)
+    -- variability as to whether pose is cartesion or joint
+    IF b1 AND UNINIT(p.joint) THEN
+      pose.xyz = p.xyz
+    ELSE IF b1 AND UNINIT(p.xyz) THEN
+      pose.joint = pose__jpos_to_jpos6(p.joint)
+    ENDIF
+    ENDIF
+
+    --get rotary group
+    SELECT grp_mask OF
+      --group 2
+      CASE (2,3) :
+        b2 = tpe__get_pose_grp(open_id, pose_no, 2, p)
+        --assume joint representation
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
+      --group 3
+      CASE (4,5) :
+        b2 = tpe__get_pose_grp(open_id, pose_no, 3, p)
+        --assume joint representation
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
+      --group 4
+      CASE (8,9) :
+        b2 = tpe__get_pose_grp(open_id, pose_no, 4, p)
+        --assume joint representation
+        IF b2 THEN
+          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
+        ENDIF
+    ENDSELECT
+
+    --OR op b1, and b2. Will return false if it didn't retrieve either
+    RETURN(b1 OR b2)
+
+  END tpe__get_pose
+
+ROUTINE tpe__get_last_pose_index
   VAR
     p_stat : hval_type
     pose : XYZWPR
@@ -400,7 +382,7 @@ ROUTINE tpe__get_last_pose
     IF b THEN RETURN(MAX_POINTS); ENDIF
 
     RETURN(last_pose)
-  END tpe__get_last_pose
+  END tpe__get_last_pose_index
 
 ROUTINE tpe__get_poses
   VAR
@@ -408,7 +390,7 @@ ROUTINE tpe__get_poses
     i : INTEGER
     length		:	INTEGER
     b : BOOLEAN
-    pos : TURNTABLE
+    pos : t_NODE
     grp_mask : INTEGER
     last_pose : INTEGER
     status : INTEGER
@@ -429,21 +411,21 @@ ROUTINE tpe__get_poses
     SELECT grp_mask OF
       --group 1
       CASE (1,3,5,7,9,11,13) :
-        last_pose = tpe__get_last_pose(TPE_name, 1)
+        last_pose = tpe__get_last_pose_index(TPE_name, 1)
       --group 2
       CASE (2) :
-        last_pose = tpe__get_last_pose(TPE_name, 2)
+        last_pose = tpe__get_last_pose_index(TPE_name, 2)
       --group 3
       CASE (4) :
-        last_pose = tpe__get_last_pose(TPE_name, 3)
+        last_pose = tpe__get_last_pose_index(TPE_name, 3)
       --group 4
       CASE (8) :
-        last_pose = tpe__get_last_pose(TPE_name, 4)
+        last_pose = tpe__get_last_pose_index(TPE_name, 4)
     ENDSELECT
     
     -- retrieve all the poses in the TP program
     FOR i = 1 TO last_pose DO
-      b = tpe__get_pose_turntable(p_stat.open_id, 1, grp_mask, pos)
+      b = tpe__get_pose(p_stat.open_id, 1, grp_mask, pos)
       IF b THEN
         --add blank nodes in between last and current
         -- found point if needed

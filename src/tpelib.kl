@@ -308,6 +308,28 @@ ROUTINE tpe__get_boolean_arg
     RETURN(TRUE)
   END tpe__get_boolean_arg
 
+ROUTINE tpe__get_vector_arg
+  VAR
+    p : XYZWPR
+    v : VECTOR
+    STATUS : INTEGER
+  BEGIN
+    IF (reg_no <= 0) THEN
+        WRITE TPERROR (CR, 'position register must be > 0')
+    ENDIF
+
+    p = GET_POS_REG(reg_no, STATUS, 1)
+    CHK_STAT(STATUS)
+    IF STATUS <> 0 THEN
+        karelError(POS_REG_NOT_SET,'PR' + i_to_s(reg_no) + ' not set for vector arg.', ER_ABORT)
+    ENDIF
+
+    v.x = p.x ; v.y = p.y ; v.z = p.z ;
+
+    RETURN(v)
+
+  END tpe__get_vector_arg
+
 ROUTINE tpe__parameter_exists
   VAR
     data_type  : INTEGER

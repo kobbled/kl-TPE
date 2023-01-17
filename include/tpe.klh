@@ -25,6 +25,8 @@ declare_function(prog_name,get_string_arg,prog_name_alias,gtargs)
 ROUTINE tpe__get_string_arg(reg_no : INTEGER) : STRING FROM tpelib
 declare_function(prog_name,get_boolean_arg,prog_name_alias,gtargb)
 ROUTINE tpe__get_boolean_arg(reg_no : INTEGER) : BOOLEAN FROM tpelib
+declare_function(prog_name,get_vector_arg,prog_name_alias,gtargv)
+ROUTINE tpe__get_vector_arg(reg_no : INTEGER) : VECTOR FROM tpelib
 declare_function(prog_name,parameter_exists,prog_name_alias,isprm)
 ROUTINE tpe__parameter_exists(reg_no : INTEGER) : BOOLEAN FROM tpelib
 

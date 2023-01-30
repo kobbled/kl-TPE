@@ -8,9 +8,6 @@
 %include files.klt
 
 %include tpe.const.klt
-%include tpe.type.klt
-
-VAR
-  prgm_stats : ARRAY[10] OF hashname
+%include tpe.types.klt
 
 %endif --tpe_t 

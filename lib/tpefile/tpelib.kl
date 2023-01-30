@@ -1,26 +1,24 @@
 PROGRAM tpelib
 %NOLOCKGROUP
 
--- USER STRUCT
-%include hash_tpeprog.klt
---print type found in hashtypetest.klt
-hash_type_define(hashtpe)
-%undef hash_type_define
-
-t_hash(hashname,hval_def,hashtpe)
-
 %include tpe.klt
+
+--hash struct
+%include hash_tpeprog.klt
+t_hash(hashname,hval_def,TPE_DICTIONARY_FILENAME)
+
+VAR
+  prgm_stats : ARRAY[10] OF hashname
 
 %from errors.klh %import CHK_STAT, karelError 
 %from strings.klh %import i_to_s
 %from pose.klh %import jpos_to_jpos6, jpos_to_jpos2
 
 %include tpe.private.klh
-%include tpe_pose.klh
 %include tpe.klh
 
--- h_prgstat
-%class hashtpe('hash.klc','hashclass.klh','hash_tpeprog.klt')
+-- Define TPE dictionary file
+%class `TPE_DICTIONARY_FILENAME`('hash.klc','hashclass.klh','hash_tpeprog.klt')
 
 BEGIN
 END tpelib
@@ -37,7 +35,7 @@ ROUTINE tpe__constructor
     b : BOOLEAN
   BEGIN
     empty.open_id = 0 ; empty.status = 0 ;
-    b = hashtpe__clear_table('tpe', 'prgm_stats', empty)
+    b = `TPE_DICTIONARY_FILENAME`__clear_table('tpelib', 'prgm_stats', empty)
   END tpe__constructor
 
 
@@ -47,7 +45,7 @@ ROUTINE tpe__destructor
     b : BOOLEAN
   BEGIN
     empty.open_id = 0 ; empty.status = 0 ;
-     b = hashtpe__clear_table('tpe', 'prgm_stats', empty)
+     b = `TPE_DICTIONARY_FILENAME`__clear_table('tpelib', 'prgm_stats', empty)
   END tpe__destructor
 
 
@@ -73,19 +71,19 @@ ROUTINE tpe__open
       p_stat.status = status
     ENDIF
 
-    b = hashtpe__put(TPE_name, p_stat, 'tpe', 'prgm_stats')
+    b = `TPE_DICTIONARY_FILENAME`__put(TPE_name, p_stat, 'tpelib', 'prgm_stats')
     IF NOT b THEN karelError(INVALID_INDEX, 'Could not write '+ TPE_name + ' to "prgm_stats" in TPE', ER_ABORT) ; ENDIF
 
   END tpe__open 
 
 ROUTINE tpe__close
   VAR
-    p_stat : hval_type
+    p_stat : TPEPROGRAMS
     status : INTEGER
     b : BOOLEAN
   BEGIN
     -- get openid if it exists
-    b = hashtpe__get(TPE_name, p_stat, 'tpe', 'prgm_stats')
+    b = `TPE_DICTIONARY_FILENAME`__get(TPE_name, p_stat, 'tpelib', 'prgm_stats')
     IF NOT b THEN karelError(TPE_UPDATE_FAILED, TPE_name + ' does not appear to be open.', ER_WARN) ; ENDIF
     --close if program foudn in log
     IF b THEN
@@ -94,7 +92,7 @@ ROUTINE tpe__close
       --check status
       CHK_STAT(status)
       --remove from hash
-      b = hashtpe__delete(TPE_name, 'tpe', 'prgm_stats')
+      b = `TPE_DICTIONARY_FILENAME`__delete(TPE_name, 'tpelib', 'prgm_stats')
     ENDIF
 
   END tpe__close

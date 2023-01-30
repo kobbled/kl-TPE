@@ -1,0 +1,14 @@
+%ifndef tpe_types_t
+%define tpe_types_t
+
+%defeval TPE_DICTIONARY_FILENAME tpelog
+
+TYPE
+  --static type for dictionary. `hash_tpeprog.klt` is needed
+  --to create from the hash module, even though this is copied.
+  TPEPROGRAMS FROM TPE_DICTIONARY_FILENAME = STRUCTURE
+    open_id : INTEGER
+    status : INTEGER
+  ENDSTRUCTURE
+
+%endif

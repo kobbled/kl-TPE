@@ -11,6 +11,6 @@
 %mode pop
 
 --declare hash for TPEPROGRAMS
-%defeval hashname tpelog
+%defeval hashname dict
 %defeval hval_def TPEPROGRAMS
 %defeval hval_type TPEPROGRAMS

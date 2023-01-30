@@ -26,23 +26,6 @@ BEGIN
 END tpelib
 
 -- *** PRIVATE ***
-ROUTINE tpe__check_if_open
-  VAR
-    p_stat : hval_type
-    b : BOOLEAN
-  BEGIN
-    --see if file is already open
-    b = hashtpe__get(TPE_name, p_stat, 'tpe', 'prgm_stats')
-    IF NOT b THEN
-      -- Open TPE program in read only
-      tpe__open(TPE_name)
-      -- retrieve to get openid
-      b = hashtpe__get(TPE_name, p_stat, 'tpe', 'prgm_stats')
-    ENDIF
-
-    RETURN(p_stat)
-  END tpe__check_if_open
-
 
 -- *** PUBLIC ***
 
@@ -115,6 +98,21 @@ ROUTINE tpe__close
     ENDIF
 
   END tpe__close
+
+ROUTINE tpe__get_open_id
+  VAR
+    p_stat : TPEPROGRAMS
+    b : BOOLEAN
+  BEGIN
+    --see if file is already open
+    b = `TPE_DICTIONARY_FILENAME`__get(TPE_name, p_stat, 'tpelib', 'prgm_stats')
+    IF NOT b THEN
+      karelError(FILE_NOT_OPEN, TPE_name + ' is not open. use TPE__open to open file first.', ER_WARN)
+    ENDIF
+
+    RETURN(p_stat)
+  END tpe__get_open_id
+
 
 --get AR variables from TPE file
 --******************
@@ -259,185 +257,4 @@ ROUTINE tpe__parameter_exists
       RETURN(TRUE)
     ENDIF
   END tpe__parameter_exists
-
---position getters
--- ------------------
-
-ROUTINE tpe__get_pose_grp
-  VAR
-    posn_typ, num_axs : INTEGER
-    p_stat : hval_type
-    status : INTEGER
-  BEGIN
-    -- get pose type
-    GET_POS_TYP(open_id, pose_no, grp_no, posn_typ, num_axs, status)
-    CHK_STAT(status)
-    IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-
-    SELECT posn_typ OF
-      -- cartesian rep
-      CASE (CC_POSITION,CC_XYZWPR,CC_EXT) :
-        -- get cartesian representation
-        pose.xyz = GET_POS_TPE(open_id, pose_no, status, grp_no)
-        CHK_STAT(status)
-        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-      -- joint rep
-      CASE (CC_JOINT) :
-        -- get joint represenation of posreg
-        pose.joint = GET_JPOS_TPE(open_id, pose_no, status, grp_no)
-        CHK_STAT(status)
-        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-    ENDSELECT
-
-    RETURN(TRUE)
-  END tpe__get_pose_grp
-
-
-ROUTINE tpe__get_pose
-  VAR
-    b1, b2 : BOOLEAN
-    p : t_POSEDATA
-  BEGIN
-    --group mask decimal corresponds with (gp1,gp2,gp3,gp4)
-    --1000 = 1 : 0100 = 2  : 0010 = 4  : 0001 = 8
-    --           1100 = 3  : 1010 = 5  : 1001 = 9
-    --           1110 = 7  : 1110 = 7  : 1011 = 13
-    --                     : 1011 = 13 :
-
-    --assume robot is on group 1
-    --get robot pose
-    b1 = tpe__get_pose_grp(open_id, pose_no, 1, p)
-    -- variability as to whether pose is cartesion or joint
-    IF b1 AND UNINIT(p.joint) THEN
-      pose.xyz = p.xyz
-    ELSE IF b1 AND UNINIT(p.xyz) THEN
-      pose.joint = pose__jpos_to_jpos6(p.joint)
-    ENDIF
-    ENDIF
-
-    --get rotary group
-    SELECT grp_mask OF
-      --group 2
-      CASE (2,3) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 2, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
-        ENDIF
-      --group 3
-      CASE (4,5) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 3, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
-        ENDIF
-      --group 4
-      CASE (8,9) :
-        b2 = tpe__get_pose_grp(open_id, pose_no, 4, p)
-        --assume joint representation
-        IF b2 THEN
-          pose.rotary = pose__jpos_to_jpos2(p.joint) ;
-        ENDIF
-    ENDSELECT
-
-    --OR op b1, and b2. Will return false if it didn't retrieve either
-    RETURN(b1 OR b2)
-
-  END tpe__get_pose
-
-ROUTINE tpe__get_last_pose_index
-  VAR
-    p_stat : hval_type
-    pose : XYZWPR
-    i, end_pose, last_pose : INTEGER
-    posn_typ, num_axs : INTEGER
-    status : INTEGER
-    b : BOOLEAN
-  BEGIN
-    p_stat = tpe__check_if_open(TPE_name)
-
-    -- get next available position
-    -- in hopes it is the last one
-    AVL_POS_NUM(p_stat.open_id, last_pose, status)
-    --if this fails return 0 so that path loop errors out
-    CHK_STAT(status)
-    IF status <> 0 THEN RETURN(0) ; ENDIF
-
-    --check the next 20 positions for existence
-    end_pose = last_pose + 20
-    b = FALSE
-    FOR i = last_pose TO end_pose DO
-      GET_POS_TYP(p_stat.open_id, i, grp_no, posn_typ, num_axs, status)
-      --check if status returns uninitialized
-      IF status <> TPE_P_UNINIT THEN
-        b = TRUE
-        GOTO END_SRCH
-      ENDIF
-    ENDFOR
-    END_SRCH::
-
-    --if it didn't find a position after use last_pose
-    --if it did find a position use MAX_POINTS as we cant
-    --determin the final position
-    IF b THEN RETURN(MAX_POINTS); ENDIF
-
-    RETURN(last_pose)
-  END tpe__get_last_pose_index
-
-ROUTINE tpe__get_poses
-  VAR
-    p_stat : hval_type
-    i : INTEGER
-    length		:	INTEGER
-    b : BOOLEAN
-    pos : t_NODE
-    grp_mask : INTEGER
-    last_pose : INTEGER
-    status : INTEGER
-  BEGIN
-    p_stat = tpe__check_if_open(TPE_name)
-
-    --get group mask
-    GET_ATTR_PRG(TPE_name, AT_DEF_GROUP, grp_mask, '', status)
-    CHK_STAT(status)
-    IF status <> 0 THEN RETURN(FALSE) ; ENDIF
-    --group mask decimal corresponds with (gp1,gp2,gp3,gp4)
-    --1000 = 1 : 0100 = 2  : 0010 = 4  : 0001 = 8
-    --           1100 = 3  : 1010 = 5  : 1001 = 9
-    --           1110 = 7  : 1110 = 7  : 1011 = 13
-    --                     : 1011 = 13 :
-
-    --get last position
-    SELECT grp_mask OF
-      --group 1
-      CASE (1,3,5,7,9,11,13) :
-        last_pose = tpe__get_last_pose_index(TPE_name, 1)
-      --group 2
-      CASE (2) :
-        last_pose = tpe__get_last_pose_index(TPE_name, 2)
-      --group 3
-      CASE (4) :
-        last_pose = tpe__get_last_pose_index(TPE_name, 3)
-      --group 4
-      CASE (8) :
-        last_pose = tpe__get_last_pose_index(TPE_name, 4)
-    ENDSELECT
-    
-    -- retrieve all the poses in the TP program
-    FOR i = 1 TO last_pose DO
-      b = tpe__get_pose(p_stat.open_id, 1, grp_mask, pos)
-      IF b THEN
-        --add blank nodes in between last and current
-        -- found point if needed
-        length = PATH_LEN(poses)
-        WHILE length < i DO
-          APPEND_NODE(poses,status)
-		      length = PATH_LEN(poses)
-        ENDWHILE
-        --add point to path
-        poses[i] = pos
-      ENDIF
-    ENDFOR
-
-  END tpe__get_poses
 

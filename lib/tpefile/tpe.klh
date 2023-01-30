@@ -15,20 +15,11 @@ declare_function(prog_name,open,prog_name_alias,open)
 ROUTINE tpe__open(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,close,prog_name_alias,close)
 ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
+--retrieve openid if open
+declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
+ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRAMS FROM tpelib
 
---get AR variables from TPE file
-declare_function(prog_name,get_int_arg,prog_name_alias,gtargi)
-ROUTINE tpe__get_int_arg(reg_no : INTEGER) : INTEGER FROM tpelib
-declare_function(prog_name,get_real_arg,prog_name_alias,gtargr)
-ROUTINE tpe__get_real_arg(reg_no : INTEGER) : REAL FROM tpelib
-declare_function(prog_name,get_string_arg,prog_name_alias,gtargs)
-ROUTINE tpe__get_string_arg(reg_no : INTEGER) : STRING FROM tpelib
-declare_function(prog_name,get_boolean_arg,prog_name_alias,gtargb)
-ROUTINE tpe__get_boolean_arg(reg_no : INTEGER) : BOOLEAN FROM tpelib
-declare_function(prog_name,get_vector_arg,prog_name_alias,gtargv)
-ROUTINE tpe__get_vector_arg(reg_no : INTEGER) : VECTOR FROM tpelib
-declare_function(prog_name,parameter_exists,prog_name_alias,isprm)
-ROUTINE tpe__parameter_exists(reg_no : INTEGER) : BOOLEAN FROM tpelib
+%include tpe.vars.klh
 
 
 %endif --tpe_h

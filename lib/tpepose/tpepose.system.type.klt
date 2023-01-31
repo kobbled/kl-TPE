@@ -1,0 +1,24 @@
+%ifndef tpe_pose_sys_type_t
+%define tpe_pose_sys_type_t
+
+--define position storage types
+-- [!IMPORTANT] t_NODE is system dependent
+-- and must be defined in the template file
+-- see tests in TPE module
+
+%mode push
+%mode string QQQ "`" "`" "\\"
+%define set_position_type(parent) `TYPE
+
+  t_POSITION FROM parent = STRUCTURE
+    id : INTEGER
+    pose : MOTION_DATA_TYPE
+  ENDSTRUCTURE
+  
+  t_JPOSITION FROM parent = STRUCTURE
+    id : INTEGER
+    pose : MOTION_DATA_JOINT_TYPE
+  ENDSTRUCTURE`
+%mode pop
+
+%endif -- tpe_pose_sys_type_t

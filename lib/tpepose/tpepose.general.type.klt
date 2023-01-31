@@ -1,0 +1,11 @@
+%ifndef tpe_pose_gen_type_t
+%define tpe_pose_gen_type_t
+
+TYPE
+  -- general pose data. Can store either cartesian or joint data
+  t_POSEDATA FROM tpe = STRUCTURE
+      xyz : XYZWPREXT
+      joint : JOINTPOS
+    ENDSTRUCTURE
+
+%endif -- tpe_pose_gen_type_t

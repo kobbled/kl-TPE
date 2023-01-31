@@ -21,6 +21,9 @@
     "files",
     "Strings",
     "Hash",
+    "pathmotion",
+    "pathlib",
+    "pathmake",
     "ktransw-macros"
   ],
   "tests-depends" : [

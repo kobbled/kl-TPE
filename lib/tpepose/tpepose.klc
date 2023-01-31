@@ -1,0 +1,357 @@
+PROGRAM class_name
+%NOBUSYLAMP
+%COMMENT = 'tpepose'
+%NOLOCKGROUP
+%NOPAUSE = COMMAND + TPENABLE + ERROR
+
+%ifeq DEBUG_BUILD FALSE
+%undef DEBUG_BUILD
+%endif
+
+%include namespace.m
+
+%ifdef DEBUG_BUILD
+%include display.c.klt
+%endif
+
+%ifdef ROT_GRP
+%ifeq ROT_GRP 0
+%undef ROT_GRP
+%endif
+%endif
+%ifdef TRACK_GRP
+%ifeq TRACK_GRP 0
+%undef TRACK_GRP
+%endif
+%endif
+
+%include errors.klt
+%include pose.const.klt
+
+%include tpe.const.klt
+%include tpe.types.klt
+
+-- define system dependent position type t_NODE
+-- [!IMPORTANT] this must be defined in a template file
+-- see test examples.
+%ifdef motion_type
+motion_type(MOTION_DATA_FILE)
+%endif
+
+-- general types that are not system specific.
+-- can be cartesian or joint
+%include tpepose.general.type.klt
+
+-- position definition struct for saving TPE positions in
+-- a t_NODE struct
+%include tpepose.system.type.klt
+set_position_type(class_name)
+
+%define BASE_CLASSNAME class_name
+
+-- dependencies
+%include errors.klh
+%include pose.klh
+%from strings.klh %import i_to_s
+%include tpe.klh
+
+%ifdef DEBUG_BUILD
+%from display.klh %import clear, show
+%endif
+
+-- Robot pose implementation header
+impl_motion_head(MOTION_DATA_FILE)
+
+%defeval class_name BASE_CLASSNAME
+
+--class headers
+%include tpepose.klh
+
+-- ************ PRIVATE MEMBERS ************
+
+ROUTINE getcartpos_(open_id : INTEGER; pose_no: INTEGER; out_pose : MOTION_DATA_TYPE) : BOOLEAN
+  VAR
+    posn_typ, num_axs, status : INTEGER
+  BEGIN
+  
+%ifdef RBT_GRP
+    --check if it is cartesian or joint
+    GET_POS_TYP(open_id, pose_no, RBT_GRP, posn_typ, num_axs, status)
+    
+    --only process cartesian positions
+    IF posn_typ <> CC_JOINT THEN
+      -- get cartesian representation
+%ifdef MOTION_TYPE_ATTR1
+      out_pose.MOTION_TYPE_ATTR1 = GET_POS_TPE(open_id, pose_no, status, RBT_GRP)
+      IF UNINIT(out_pose.MOTION_TYPE_ATTR1) THEN RETURN(FALSE) ; ENDIF
+%else
+      out_pose = GET_POS_TPE(open_id, pose_no, status, RBT_GRP)
+      IF UNINIT(out_pose) THEN RETURN(FALSE) ; ENDIF
+%endif
+      CHK_STAT(status)
+    ELSE
+%ifdef DEBUG_BUILD
+      karelError(INVALID_POSITION_TYPE, 'P[' + i_to_s(pose_no) + '] is not a cartesian position.', ER_WARN)
+%endif
+      RETURN(FALSE)
+    ENDIF
+%endif
+
+%ifdef ROT_GRP
+    out_pose.MOTION_TYPE_ATTR2 = GET_JPOS_TPE(open_id, pose_no, status, ROT_GRP)
+%endif
+
+    RETURN(TRUE)
+
+  END getcartpos_
+
+
+ROUTINE getjointpos_(open_id : INTEGER; pose_no: INTEGER; out_pose : MOTION_DATA_JOINT_TYPE) : BOOLEAN
+  VAR
+    posn_typ, num_axs, status : INTEGER
+  BEGIN
+  
+%ifdef RBT_GRP
+    --check if it is cartesian or joint
+    GET_POS_TYP(open_id, pose_no, RBT_GRP, posn_typ, num_axs, status)
+    
+    --only process joint positions
+    IF NOT UNINIT(num_axs) THEN
+      -- get joint representation
+%ifdef MOTION_TYPE_ATTR1
+      out_pose.MOTION_TYPE_ATTR1 = GET_JPOS_TPE(open_id, pose_no, status, RBT_GRP)
+      IF UNINIT(out_pose.MOTION_TYPE_ATTR1) THEN RETURN(FALSE) ; ENDIF
+%else
+      out_pose = GET_JPOS_TPE(open_id, pose_no, status, RBT_GRP)
+      IF UNINIT(out_pose) THEN RETURN(FALSE) ; ENDIF
+%endif
+      CHK_STAT(status)
+    ELSE
+%ifdef DEBUG_BUILD
+      karelError(INVALID_POSITION_TYPE, 'P[' + i_to_s(pose_no) + '] is not a joint position.', ER_WARN)
+%endif
+      RETURN(FALSE)
+    ENDIF
+%endif
+
+%ifdef ROT_GRP
+    out_pose.MOTION_TYPE_ATTR2 = GET_JPOS_TPE(open_id, pose_no, status, ROT_GRP)
+%endif
+
+    RETURN(TRUE)
+  END getjointpos_
+
+-- return the index of the next open pose in the /POSE set
+ROUTINE lastposidx_(open_id : INTEGER; grp_no : INTEGER) : INTEGER
+  VAR
+    pose : XYZWPR
+    i, last_pose : INTEGER
+    posn_typ, num_axs : INTEGER
+    status : INTEGER
+  BEGIN
+
+LOOPIDX::
+    -- get next available position
+    -- in hopes it is the last one
+    AVL_POS_NUM(open_id, last_pose, status)
+
+    --if this fails return 0 so that path loop errors out
+    CHK_STAT(status)
+
+    --check the next 20 positions for existence. There may be 
+    --a gap in the list and need to check for this.
+    FOR i = last_pose+1 TO last_pose + 20 DO
+      GET_POS_TYP(open_id, i, grp_no, posn_typ, num_axs, status)
+      --check if status found a position.
+      --if next 20 position are uninitialized then return last_pose
+      
+      IF status = SUCCESS THEN
+        --found a position loop AVL_POS_NUM to find the next last position
+        GOTO LOOPIDX
+      ENDIF
+    ENDFOR
+
+    RETURN(last_pose-1)
+
+  END lastposidx_
+
+
+-- ************ PUBLIC MEMBERS ************
+-- getters
+
+ROUTINE get_pose_grp
+  VAR
+    posn_typ, num_axs : INTEGER
+    p_stat : TPEPROGRAMS
+    status : INTEGER
+  BEGIN
+    -- get open id of prog
+    p_stat = tpe__get_open_id(TPE_name)
+
+    -- get pose type
+    GET_POS_TYP(p_stat.open_id, pose_no, grp_no, posn_typ, num_axs, status)
+    CHK_STAT(status)
+    IF status <> 0 THEN RETURN(FALSE) ; ENDIF
+
+    SELECT posn_typ OF
+      -- cartesian rep
+      CASE (CC_POSITION,CC_XYZWPR,CC_EXT) :
+        -- get cartesian representation
+        pose.xyz = GET_POS_TPE(p_stat.open_id, pose_no, status, grp_no)
+        CHK_STAT(status)
+        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
+      -- joint rep
+      CASE (CC_JOINT) :
+        -- get joint represenation of posreg
+        pose.joint = GET_JPOS_TPE(p_stat.open_id, pose_no, status, grp_no)
+        CHK_STAT(status)
+        IF status <> 0 THEN RETURN(FALSE) ; ENDIF
+    ENDSELECT
+
+    RETURN(TRUE)
+  END get_pose_grp
+
+ROUTINE get_cart_pose
+  VAR
+    p_stat : TPEPROGRAMS
+    p : MOTION_DATA_TYPE
+    b : BOOLEAN
+  BEGIN
+    -- get open id of prog
+    p_stat = tpe__get_open_id(TPE_name)
+
+    b = getcartpos_(p_stat.open_id, pose_no, p)
+
+    RETURN(p)
+
+  END get_cart_pose
+
+ROUTINE get_joint_pose
+  VAR
+    p_stat : TPEPROGRAMS
+    p : MOTION_DATA_JOINT_TYPE
+    b : BOOLEAN
+  BEGIN
+    -- get open id of prog
+    p_stat = tpe__get_open_id(TPE_name)
+
+    b = getjointpos_(p_stat.open_id, pose_no, p)
+
+    RETURN(p)
+
+  END get_joint_pose
+
+ROUTINE get_last_pose_index
+  VAR
+    p_stat : TPEPROGRAMS
+  BEGIN
+    p_stat = tpe__get_open_id(TPE_name)
+
+    RETURN(lastposidx_(p_stat.open_id, 1))
+  END get_last_pose_index
+
+ROUTINE get_cart_poses
+  VAR
+    p_stat : TPEPROGRAMS
+    pos : t_POSITION
+    i : INTEGER
+    last_pose : INTEGER
+    status : INTEGER
+    b : BOOLEAN
+  BEGIN
+    p_stat = tpe__get_open_id(TPE_name)
+
+    -- get last index
+    last_pose = lastposidx_(p_stat.open_id, 1)
+
+%ifdef DEBUG_BUILD
+    WRITE('last position index: ', last_pose, CR)
+%endif
+
+    -- retrieve all the poses in the TP program
+    FOR i = 1 TO last_pose DO
+      b = getcartpos_(p_stat.open_id, i, pos.pose)
+      IF b THEN
+        pos.id = i
+
+        APPEND_NODE(poses,status)
+        --add point to path
+        poses[PATH_LEN(poses)] = pos
+      ENDIF
+    ENDFOR
+
+  END get_cart_poses
+
+ROUTINE get_joint_poses
+  VAR
+    p_stat : TPEPROGRAMS
+    pos : t_JPOSITION
+    i : INTEGER
+    last_pose : INTEGER
+    status : INTEGER
+    b : BOOLEAN
+  BEGIN
+    p_stat = tpe__get_open_id(TPE_name)
+
+    -- get last index
+    last_pose = lastposidx_(p_stat.open_id, 1)
+
+%ifdef DEBUG_BUILD
+    WRITE('last position index: ', last_pose, CR)
+%endif
+
+    -- retrieve all the poses in the TP program
+    FOR i = 1 TO last_pose DO
+      b = getjointpos_(p_stat.open_id, i, pos.pose)
+      IF b THEN
+        pos.id = i
+
+        APPEND_NODE(poses,status)
+        --add point to path
+        poses[PATH_LEN(poses)] = pos
+      ENDIF
+    ENDFOR
+
+  END get_joint_poses
+
+-- setters
+ROUTINE set_cart_pose
+  VAR
+    p_stat : TPEPROGRAMS
+    status : INTEGER
+  BEGIN
+    p_stat = tpe__get_open_id(TPE_name)
+
+%ifdef MOTION_TYPE_ATTR1
+    SET_POS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR1, status, RBT_GRP)
+%else
+    SET_POS_TPE(p_stat.open_id, pose_no, pose, status, RBT_GRP)
+%endif
+
+%ifdef ROT_GRP
+    SET_JPOS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR2, status, ROT_GRP)
+%endif
+    
+  END set_cart_pose
+
+ROUTINE set_joint_pose
+  VAR
+    p_stat : TPEPROGRAMS
+    status : INTEGER
+  BEGIN
+    p_stat = tpe__get_open_id(TPE_name)
+
+%ifdef MOTION_TYPE_ATTR1
+    SET_JPOS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR1, status, RBT_GRP)
+%else
+    SET_JPOS_TPE(p_stat.open_id, pose_no, pose, status, RBT_GRP)
+%endif
+
+%ifdef ROT_GRP
+    SET_JPOS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR2, status, ROT_GRP)
+%endif
+
+  END set_joint_pose
+
+BEGIN
+END class_name

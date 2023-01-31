@@ -1,0 +1,37 @@
+--header
+%include header_guard.m
+--oop
+%include namespace.m
+
+--start header file
+header_if -- ifndef class
+header_def -- define class
+
+--position setters
+
+
+--position getters
+  -- get pose of a specified group. Will store in POSEDATA if a caresian or joint position is found
+declare_member(class_name,get_pose_grp,class_name,gtpsg)
+ROUTINE get_pose_grp(TPE_name : STRING; pose_no : INTEGER; grp_no : INTEGER; pose : t_POSEDATA) : BOOLEAN FROM class_name
+  -- get the pose 
+declare_member(class_name,get_cart_pose,class_name,gtcps)
+ROUTINE get_cart_pose(TPE_name : STRING; pose_no: INTEGER) : MOTION_DATA_TYPE FROM class_name
+declare_member(class_name,get_joint_pose,class_name,gtjps)
+ROUTINE get_joint_pose(TPE_name : STRING; pose_no: INTEGER) : MOTION_DATA_JOINT_TYPE FROM class_name
+  -- return the index of the next open pose in the /POSE set
+declare_member(class_name,get_last_pose_index,class_name,glpi)
+ROUTINE get_last_pose_index(TPE_name : STRING) : INTEGER FROM class_name
+  --retrieve all poses in file and store in `poses` PATH.
+declare_member(class_name,get_cart_poses,class_name,gtpss)
+ROUTINE get_cart_poses(TPE_name : STRING; poses : PATH NODEDATA = t_POSITION) FROM class_name
+declare_member(class_name,get_joint_poses,class_name,gtjss)
+ROUTINE get_joint_poses(TPE_name : STRING; poses : PATH NODEDATA = t_JPOSITION) FROM class_name
+
+--position setters
+declare_member(class_name,set_cart_pose,class_name,stcps)
+ROUTINE set_cart_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_TYPE) FROM class_name
+declare_member(class_name,set_joint_pose,class_name,stjps)
+ROUTINE set_joint_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_JOINT_TYPE) FROM class_name
+
+%endif --end header

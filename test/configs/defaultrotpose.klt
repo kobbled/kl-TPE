@@ -1,0 +1,21 @@
+--robot group
+%define RBT_GRP 1
+--rotary group
+%define ROT_GRP 2
+-- total number of joints in turntable group
+%define ROT_AXES 1
+-- rotary axis of the turntable
+%define ROTARY_JNT 1
+%define ROT_DIRECTION -1
+
+%define DEFAULT_CONFIG 'F U T, 0, 0, 0'
+
+--group mask decimal corresponds with (gp1,gp2,gp3,gp4)
+--1000 = 1 : 0100 = 2  : 0010 = 4  : 0001 = 8
+--           1100 = 3  : 1010 = 5  : 1001 = 9
+--           1110 = 7  : 1110 = 7  : 1011 = 13
+--           1111 = 15 : 1011 = 13 :
+%define CELL_GRPMASK 3
+
+--import robot pose implentation
+%include rotary.motion.impl.klt

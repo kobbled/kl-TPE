@@ -1,9 +1,98 @@
 PROGRAM test_tpe
 %NOLOCKGROUP
 
+%ifeq DEBUG_BUILD FALSE
+%undef DEBUG_BUILD
+%endif
+
+%define TEST_TPP_PROGRAM 'test_tpe_ls'
+
+%include tpe.klt
+
+-- define system dependent position type t_NODE
+-- [!IMPORTANT] this must be defined in a template file
+-- see test examples.
+%include defaultrotpose.klt
+
+%ifdef motion_type
+motion_type(MOTION_DATA_FILE)
+%endif
+
+--tpe specific types
+%include tpepose.general.type.klt
+
+%include tpepose.system.type.klt
+set_position_type(tsttpe)
+
+VAR
+  cart_poses : PATH nodedata = t_POSITION
+  jnt_poses : PATH nodedata = t_JPOSITION
+
 %include tpe.klh
 %include kunit.klh
 
+%ifdef DEBUG_BUILD
+%from display.klh %import clear, show
+%endif
+
+-- Robot pose implementation header
+impl_motion_head(MOTION_DATA_FILE)
+
+%class tsttpe('tpepose.klc','tpepose.klh','defaultrotpose.klt')
+
+--clear
+
+ROUTINE clear_cart(p : PATH nodedata = t_POSITION)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_cart
+
+ROUTINE clear_joint(p : PATH nodedata = t_JPOSITION)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_joint
+
+ROUTINE clear_poses
+  BEGIN
+    clear_cart(cart_poses)
+    clear_joint(jnt_poses)
+  END clear_poses
+
+--test methods
+
+ROUTINE t_gettpepos
+  BEGIN
+    --clear data
+    clear_poses
+
+    tpe__open(TEST_TPP_PROGRAM)
+    tsttpe__get_cart_poses(TEST_TPP_PROGRAM, cart_poses)
+    tsttpe__get_joint_poses(TEST_TPP_PROGRAM, jnt_poses)
+    tpe__close(TEST_TPP_PROGRAM)
+  END t_gettpepos
 
 BEGIN
+%ifdef DEBUG_BUILD
+  display__clear
+%endif
+
+  t_gettpepos
+
+  kunit_done
+
+%ifdef DEBUG_BUILD
+  display__show
+%endif
 END test_tpe

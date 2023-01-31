@@ -1,0 +1,4 @@
+--include default interface
+%include rotary.motion.interface.klt
+
+%defeval MOTION_DATA_FILE rbtgp2

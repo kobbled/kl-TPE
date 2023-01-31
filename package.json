@@ -12,9 +12,6 @@
     "lib/tpefile",
     "lib/tpepose"
   ],
-  "tests" : [
-    "test/test_tpe_ls.tpp"
-  ],
   "depends" : [
     "pose",
     "errors",
@@ -26,7 +23,15 @@
     "pathmake",
     "ktransw-macros"
   ],
+  "tests" : [
+    "test/test_tpe.kl",
+    "test/test_tpe_ls.tpp"
+  ],
+  "tests-includes" : [
+    "test/configs"
+  ],
   "tests-depends" : [
     "KUnit"
-  ]
+  ],
+  "macros" : ["DEBUG_BUILD=TRUE"]
 }

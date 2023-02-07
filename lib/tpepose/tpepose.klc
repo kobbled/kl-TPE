@@ -43,6 +43,8 @@ PROGRAM class_name
 motion_type(MOTION_DATA_FILE)
 %endif
 
+%include motion.deps.klt
+
 -- general types that are not system specific.
 -- can be cartesian or joint
 %include tpepose.general.type.klt
@@ -68,11 +70,13 @@ set_position_type(class_name)
 %from display.klh %import clear, show
 %endif
 
+%ifeq BUILD_ROBOT_INTERFACE TRUE
+--define robot motion interface
+robot_motion_define(MOTION_DATA_FILE,CONFIG_FILENAME)
+%else
 -- Robot pose implementation header
--- > [!WARNING] Dont try to build the robotmotion class in the tpe module
--- > currently it will only build in the motion module due to dependencies
--- > only defining headers here!
 impl_motion_head(MOTION_DATA_FILE)
+%endif
 
 %defeval class_name BASE_CLASSNAME
 

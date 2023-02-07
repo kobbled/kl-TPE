@@ -1,5 +1,10 @@
 %define CONFIG_FILENAME defaultrotpose.klt
 
+--..IMPORTANT:: Set to true if you want to build the robot pose implementation
+--              For example if you have built this implementation from pathmotion
+--              you may not want to rebuild it, which could cause linking errors
+%define BUILD_ROBOT_INTERFACE TRUE
+
 --robot group
 %define RBT_GRP 1
 --rotary group
@@ -19,5 +24,32 @@
 --           1111 = 15 : 1011 = 13 :
 %define CELL_GRPMASK 3
 
+-- *********
+--rotary parameters
+%define ROT_AXES 1
+%define ROTARY_JNT 1 
+%define ROT_DIRECTION -1
+-- *********
+
+--planning corner start
+%defeval OD_CORNER LEFT_TOP
+%defeval ID_CORNER LEFT_BOTTOM
+
+--tool orientation
+%define TOOL_ORIENT_UP 0,0,0
+%define TOOL_ORIENT_DOWN 0,0,180
+
 --import robot pose implentation
 %include rotary.motion.impl.klt
+
+--pathmake implementation
+%include rotaryPath.impl.klt
+
+--pathplan
+------------------
+%defeval PATH_PLAN_NAME tsplrt
+%define PATHPLAN_CONFIG_FILENAME rotaryPlan.klt
+
+--pathclass object
+------------------
+%defeval PATH_OBJECT_NAME tstrot

@@ -9,6 +9,9 @@ t_hash(hashname,hval_def,TPE_DICTIONARY_FILENAME)
 
 VAR
   prgm_stats : ARRAY[10] OF hashname
+  curr_prog : STRING[30]
+  curr_line : STRING[128]
+  tpefile : FILE
 
 %from errors.klh %import CHK_STAT, karelError 
 %from pose.klh %import jpos_to_jpos6, jpos_to_jpos2
@@ -97,6 +100,55 @@ ROUTINE tpe__close
     ENDIF
 
   END tpe__close
+
+ROUTINE tpe__open_file
+  VAR
+    dstr : STRING[3]
+    i : INTEGER
+  BEGIN
+    curr_prog = 'MD:/'+to_upper(TPE_name)+'.LS'
+    curr_line = ''
+
+    files__open(curr_prog, 'RO', tpefile)
+    dstr = ''
+
+    --buffer until the start of the program
+    WHILE dstr <> '/MN' DO
+      files__read_line_ref(curr_prog, tpefile, curr_line)
+      dstr = SUB_STR(curr_line,1,3)
+    ENDWHILE
+
+  END tpe__open_file
+
+ROUTINE tpe__close_file
+  BEGIN
+    files__close(curr_prog, tpefile)
+
+    curr_prog = ''
+    curr_line = ''
+  END tpe__close_file
+
+ROUTINE tpe__sanitize_line
+  VAR
+    idx : INTEGER
+  BEGIN
+    --remove leading spaces
+    curr_line = lstrip(curr_line)
+    --find index of colon
+    idx = 0
+    idx = char_index(curr_line, ':')
+    IF idx > 0 THEN
+      curr_line = SUB_STR(curr_line, idx+1, STR_LEN(curr_line))
+    ENDIF
+
+    --remove trailing spaces
+    curr_line = rstrip(curr_line)
+    --assume last character is semi-colon
+    IF SUB_STR(curr_line, STR_LEN(curr_line), 1) = ';' THEN
+      curr_line = SUB_STR(curr_line, 1, STR_LEN(curr_line)-1)
+    ENDIF
+
+  END tpe__sanitize_line
 
 ROUTINE tpe__get_open_id
   VAR

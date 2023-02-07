@@ -1,0 +1,9 @@
+%ifndef tpe_friends_h
+%define tpe_friends_h
+
+VAR
+  curr_prog FROM tpelib: STRING[30]
+  curr_line FROM tpelib: STRING[128]
+  tpefile FROM tpelib: FILE
+
+%endif --tpe_friends_h

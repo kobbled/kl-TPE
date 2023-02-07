@@ -15,6 +15,12 @@ declare_function(prog_name,open,prog_name_alias,open)
 ROUTINE tpe__open(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,close,prog_name_alias,close)
 ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,open_file,prog_name_alias,opnfl)
+ROUTINE tpe__open_file(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,close_file,prog_name_alias,clsfl)
+ROUTINE tpe__close_file(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,sanitize_line,prog_name_alias,sanln)
+ROUTINE tpe__sanitize_line FROM tpelib
 --retrieve openid if open
 declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
 ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRAMS FROM tpelib

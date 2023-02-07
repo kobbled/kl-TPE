@@ -7,7 +7,9 @@
 header_if -- ifndef class
 header_def -- define class
 
---position setters
+--position initailizers
+declare_member(class_name,set_motion_default,class_name,stmtd)
+ROUTINE set_motion_default : t_MOTIONSTAT FROM class_name
 
 
 --position getters
@@ -28,11 +30,22 @@ ROUTINE get_cart_poses(TPE_name : STRING; poses : PATH NODEDATA = t_POSITION) FR
 declare_member(class_name,get_joint_poses,class_name,gtjss)
 ROUTINE get_joint_poses(TPE_name : STRING; poses : PATH NODEDATA = t_JPOSITION) FROM class_name
 
+--read LS file
+declare_member(class_name,is_line_a_motion,class_name,islmt)
+ROUTINE is_line_a_motion(motion_line : STRING) : BOOLEAN FROM class_name
+declare_member(class_name,parse_motion,class_name,prsmt)
+ROUTINE parse_motion(motion_line : STRING) : t_MOTIONSTAT FROM class_name
+declare_member(class_name,get_motion_statements,class_name,gtmst)
+ROUTINE get_motion_statements(pth : PATH nodedata = t_MOTIONSTAT) FROM class_name
+
 --position setters
 declare_member(class_name,set_cart_pose,class_name,stcps)
 ROUTINE set_cart_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_TYPE) FROM class_name
 declare_member(class_name,set_joint_pose,class_name,stjps)
 ROUTINE set_joint_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_JOINT_TYPE) FROM class_name
+declare_member(class_name,set_tpe_poses,class_name,sttpp)
+ROUTINE set_tpe_poses(TPE_name : STRING; cart_poses: PATH NODEDATA = t_POSITION; joint_poses: PATH NODEDATA = t_JPOSITION) FROM class_name
+
 --position methods
 declare_member(class_name,copy_cart_poses,class_name,cppss)
 ROUTINE copy_cart_poses(poses : PATH NODEDATA = t_POSITION; out_poses : PATH NODEDATA = t_POSITION) FROM class_name

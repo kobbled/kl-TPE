@@ -10,6 +10,26 @@ TYPE
       frame :SHORT
     ENDSTRUCTURE
 
+  t_MOTIONCALL FROM tpe = STRUCTURE
+    prog : STRING[16]
+    callTime : REAL
+    pin : INTEGER
+    pinState : BOOLEAN
+    timeBefore : BOOLEAN
+  ENDSTRUCTURE
+
+  t_MOTIONSTAT FROM tpe = STRUCTURE
+      callback : t_MOTIONCALL
+      id : SHORT
+      typ : BYTE
+      term : BYTE
+      speed : BYTE
+      accel : BYTE
+      tool_offset : BYTE
+      frame_offset : BYTE
+      coord : BOOLEAN
+      rtcp : BOOLEAN
+      fine : BOOLEAN
     ENDSTRUCTURE
 
 %endif -- tpe_pose_gen_type_t

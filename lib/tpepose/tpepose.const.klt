@@ -1,0 +1,11 @@
+%ifndef tpe_pose_const_type_t
+%define tpe_pose_const_type_t
+
+--motion type enum
+CONST
+  MOVE_JOINT = 1
+  MOVE_LINEAR = 2
+  MOVE_CIRCLE = 3
+  MOVE_ARC = 4
+
+%endif -- tpe_pose_const_type_t

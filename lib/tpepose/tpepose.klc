@@ -52,6 +52,9 @@ motion_type(MOTION_DATA_FILE)
 %include tpepose.system.type.klt
 set_position_type(class_name)
 
+--add tpefile friend members
+%include tpefile.friend.member.klt
+
 %define BASE_CLASSNAME class_name
 
 -- dependencies
@@ -66,6 +69,9 @@ set_position_type(class_name)
 %endif
 
 -- Robot pose implementation header
+-- > [!WARNING] Dont try to build the robotmotion class in the tpe module
+-- > currently it will only build in the motion module due to dependencies
+-- > only defining headers here!
 impl_motion_head(MOTION_DATA_FILE)
 
 %defeval class_name BASE_CLASSNAME
@@ -181,9 +187,32 @@ LOOPIDX::
 
   END lastposidx_
 
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+-- %%%%%%%%%%%%% PUBLIC MEMBERS %%%%%%%%%%%%%
+-- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
--- ************ PUBLIC MEMBERS ************
--- getters
+-- ******* intializers ******
+-- **************************
+
+ROUTINE set_motion_default
+  VAR
+    motiondata : t_MOTIONSTAT
+  BEGIN
+    motiondata.fine = FALSE
+    motiondata.accel = 0
+
+    motiondata.coord = FALSE
+    motiondata.rtcp = FALSE
+
+    motiondata.tool_offset = 0
+    motiondata.frame_offset = 0
+
+    RETURN(motiondata)
+  END set_motion_default
+
+
+-- ********* getters ********
+-- **************************
 
 ROUTINE get_pose_grp
   VAR
@@ -336,7 +365,209 @@ ROUTINE get_joint_poses
 
   END get_joint_poses
 
--- setters
+-- ****** Read LS File ******
+-- **************************
+
+ROUTINE is_line_a_motion
+  BEGIN
+    IF SUB_STR(motion_line,1,1) = 'J' THEN
+      RETURN(TRUE)
+    ENDIF
+    IF SUB_STR(motion_line,1,1) = 'L' THEN
+      RETURN(TRUE)
+    ENDIF
+    IF SUB_STR(motion_line,1,1) = 'C' THEN
+      RETURN(TRUE)
+    ENDIF
+    IF SUB_STR(motion_line,1,1) = 'A' THEN
+      RETURN(TRUE)
+    ENDIF
+    
+    RETURN(FALSE)
+  END is_line_a_motion
+
+ROUTINE parse_mod_(motion_line : STRING; motiondata : t_MOTIONSTAT)
+  VAR
+    dstr : STRING[32]
+  BEGIN
+    --get modifier
+    dstr = takeStr(motion_line, ' ')
+
+    IF SUB_STR(dstr, 1, 3) = 'ACC' THEN
+      motiondata.accel = getIntInStr(dstr)
+    ELSE IF SUB_STR(dstr, 1, 3) = 'COO' THEN
+      motiondata.coord = TRUE
+    ELSE IF SUB_STR(dstr, 1, 3) = 'RTC' THEN
+      motiondata.rtcp = TRUE
+    ELSE IF SUB_STR(dstr, 1,3) = 'Too' THEN
+      motion_line = takeNextStr(motion_line, ',')
+      motiondata.tool_offset = getIntInStr(dstr)
+    ELSE IF SUB_STR(dstr, 1,3) = 'Off' THEN
+      motion_line = takeNextStr(motion_line, ',')
+      motiondata.frame_offset = getIntInStr(dstr)
+    ELSE IF (SUB_STR(dstr, 1, 2) = 'TA') OR (SUB_STR(dstr, 1, 2) = 'TB') THEN
+      IF SUB_STR(dstr, 1, 2) = 'TB' THEN
+        motiondata.callback.timeBefore = TRUE
+      ENDIF
+
+      --Move to next part of the TA/TB modifier
+      motion_line = takeNextStr(motion_line, ' ')
+        --take out extra spaces
+      motion_line = lstrip(motion_line)
+        --get time
+      dstr = takeStr(motion_line, ',')
+      motiondata.callback.callTime = s_to_r(SUB_STR(dstr, 1, 4))
+        --get program or pin
+      motion_line = takeNextStr(motion_line, ',')
+      dstr = takeStr(motion_line, ' ')
+      IF SUB_STR(dstr, 1, 3) = 'DO[' THEN
+          --get DO pin
+        dstr = takeStr(motion_line, '=')
+        motiondata.callback.pin = getIntInStr(dstr)
+        motion_line = takeNextStr(motion_line, '=')
+          --determine if pin is ON or OFF
+        dstr = takeStr(motion_line, ' ')
+        IF STR_LEN(dstr) < 3 THEN -- ON 
+          motiondata.callback.pinState = TRUE
+        ELSE -- OFF
+          motiondata.callback.pinState = FALSE
+        ENDIF
+      ELSE
+        --get time after program
+        motion_line = takeNextStr(motion_line, ' ')
+        dstr = takeStr(motion_line, ' ')
+        motiondata.callback.prog = dstr
+      ENDIF
+    ENDIF
+    ENDIF
+    ENDIF
+    ENDIF
+    ENDIF
+    ENDIF
+
+    --..NOTE:: if the modifier is not listed it will be skipped
+
+    --move to next modifier
+    motion_line = takeNextStr(motion_line, ' ')
+    motion_line = lstrip(motion_line)
+
+  END parse_mod_
+
+ROUTINE parse_pose_(motion_line : STRING; motiondata : t_MOTIONSTAT)
+  VAR
+    dstr : STRING[32]
+    idx : INTEGER
+  BEGIN
+    dstr = takeStr(motion_line, ' ')
+      --remove 'P[]'
+    dstr = SUB_STR(dstr,3,STR_LEN(dstr)-1)
+      --remove comment
+    idx = char_index(dstr, ':') - 1
+    IF idx > 0 THEN
+      dstr = SUB_STR(dstr,1,idx)
+    ENDIF
+
+    motiondata.id = s_to_i(dstr)
+
+    motion_line = takeNextStr(motion_line, ' ')
+  END parse_pose_
+
+ROUTINE parse_speed_(motion_line : STRING; motiondata : t_MOTIONSTAT)
+  VAR
+    dstr : STRING[32]
+  BEGIN
+    dstr = takeStr(motion_line, ' ')
+    motiondata.speed = getIntInStr(dstr)
+
+    motion_line = takeNextStr(motion_line, ' ')
+  END parse_speed_
+
+ROUTINE parse_term_(motion_line : STRING; motiondata : t_MOTIONSTAT)
+  VAR
+    dstr : STRING[32]
+  BEGIN
+    dstr = takeStr(motion_line, ' ')
+
+    motiondata.fine = FALSE
+    IF dstr = 'FINE' THEN
+      motiondata.fine = TRUE
+      motiondata.term = 0
+    ELSE
+      motiondata.term = getIntInStr(dstr)
+    ENDIF
+
+    motion_line = takeNextStr(motion_line, ' ')
+  END parse_term_
+
+--motion string should have the ':' removed already. First character
+--should be the motion type
+ROUTINE parse_motion
+  VAR
+    motiondata : t_MOTIONSTAT
+  BEGIN
+    --initialize motion data
+    motiondata = set_motion_default
+
+    --get motion type
+    IF SUB_STR(motion_line,1,1) = 'J' THEN
+      motiondata.typ = MOVE_JOINT
+    ELSE IF SUB_STR(motion_line,1,1) = 'L' THEN
+      motiondata.typ = MOVE_LINEAR
+    ELSE IF SUB_STR(motion_line,1,1) = 'C' THEN
+      motiondata.typ = MOVE_CIRCLE
+    ELSE IF SUB_STR(motion_line,1,1) = 'A' THEN
+      motiondata.typ = MOVE_ARC
+    ENDIF
+    ENDIF
+    ENDIF
+    ENDIF
+
+    motion_line = takeNextStr(motion_line, ' ')
+
+    --get position index
+    parse_pose_(motion_line, motiondata)
+
+    --get speed
+    parse_speed_(motion_line, motiondata)
+
+    --get termination
+    parse_term_(motion_line, motiondata)
+
+    --search for modifiers until string is empty
+    WHILE STR_LEN(motion_line) > 0 DO
+      parse_mod_(motion_line, motiondata)
+    ENDWHILE
+
+    RETURN(motiondata)
+  END parse_motion
+
+ROUTINE get_motion_statements
+  VAR
+    dstr : STRING[4]
+    i,status : INTEGER
+  BEGIN
+    i = PATH_LEN(pth)
+    dstr = ''
+
+    WHILE dstr <> '/POS' DO
+      --get next line
+      files__read_line_ref(curr_prog, tpefile, curr_line)
+      tpe__sanitize_line
+      dstr = SUB_STR(curr_line,1,4)
+
+      --determine if line is a motion statement
+      IF is_line_a_motion(curr_line) THEN
+        --parse motion statement
+        i = i + 1
+        APPEND_NODE(pth,status)
+        pth[i] = parse_motion(curr_line)
+      ENDIF
+    ENDWHILE
+  END get_motion_statements
+
+-- ****** setters *****
+-- ********************
+
 ROUTINE set_cart_pose
   VAR
     p_stat : TPEPROGRAMS
@@ -374,6 +605,22 @@ ROUTINE set_joint_pose
 %endif
 
   END set_joint_pose
+
+ROUTINE set_tpe_poses
+  VAR
+    i : INTEGER
+  BEGIN
+    --add joint poses
+    FOR i=1 TO PATH_LEN(joint_poses) DO
+      set_joint_pose(TPE_name, (joint_poses[i].id), joint_poses[i].pose)
+    ENDFOR
+
+    --add cart poses
+    FOR i=1 TO PATH_LEN(cart_poses) DO
+      set_cart_pose(TPE_name, (cart_poses[i].id), cart_poses[i].pose)
+    ENDFOR
+
+  END set_tpe_poses
 
 -- ***** methods ******
 -- ********************

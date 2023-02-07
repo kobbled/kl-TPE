@@ -27,9 +27,14 @@ PROGRAM class_name
 
 %include errors.klt
 %include pose.const.klt
+%include pathlib.klt
+%include toolpath.structs.klt
 
 %include tpe.const.klt
 %include tpe.types.klt
+
+--enums for motion statements
+%include tpepose.const.klt
 
 -- define system dependent position type t_NODE
 -- [!IMPORTANT] this must be defined in a template file
@@ -52,7 +57,8 @@ set_position_type(class_name)
 -- dependencies
 %include errors.klh
 %include pose.klh
-%from strings.klh %import i_to_s
+%include strings.klh
+%from files.klh %import read_line_ref
 %include tpe.klh
 
 %ifdef DEBUG_BUILD
@@ -182,6 +188,7 @@ LOOPIDX::
 ROUTINE get_pose_grp
   VAR
     posn_typ, num_axs : INTEGER
+    utool, uframe : INTEGER
     p_stat : TPEPROGRAMS
     status : INTEGER
   BEGIN
@@ -207,6 +214,11 @@ ROUTINE get_pose_grp
         CHK_STAT(status)
         IF status <> 0 THEN RETURN(FALSE) ; ENDIF
     ENDSELECT
+
+    --set toolframe, and userframe
+    GET_POS_FRM(p_stat.open_id, pose_no, 1, uframe, utool, status)
+    pose.frame = uframe
+    pose.tool = utool
 
     RETURN(TRUE)
   END get_pose_grp
@@ -256,6 +268,7 @@ ROUTINE get_cart_poses
     pos : t_POSITION
     i : INTEGER
     last_pose : INTEGER
+    utool, uframe : INTEGER
     status : INTEGER
     b : BOOLEAN
   BEGIN
@@ -273,6 +286,10 @@ ROUTINE get_cart_poses
       b = getcartpos_(p_stat.open_id, i, pos.pose)
       IF b THEN
         pos.id = i
+        --get toolframe, and userframe
+        GET_POS_FRM(p_stat.open_id, i, RBT_GRP, uframe, utool, status)
+        pos.tool = utool
+        pos.frame = uframe 
 
         APPEND_NODE(poses,status)
         --add point to path
@@ -288,6 +305,7 @@ ROUTINE get_joint_poses
     pos : t_JPOSITION
     i : INTEGER
     last_pose : INTEGER
+    utool, uframe : INTEGER
     status : INTEGER
     b : BOOLEAN
   BEGIN
@@ -305,7 +323,11 @@ ROUTINE get_joint_poses
       b = getjointpos_(p_stat.open_id, i, pos.pose)
       IF b THEN
         pos.id = i
-
+        --get toolframe, and userframe
+        GET_POS_FRM(p_stat.open_id, i, RBT_GRP, uframe, utool, status)
+        pos.tool = utool
+        pos.frame = uframe 
+        
         APPEND_NODE(poses,status)
         --add point to path
         poses[PATH_LEN(poses)] = pos
@@ -352,6 +374,53 @@ ROUTINE set_joint_pose
 %endif
 
   END set_joint_pose
+
+-- ***** methods ******
+-- ********************
+
+ROUTINE copy_cart_poses
+  VAR
+   i, status : INTEGER
+  BEGIN
+    FOR i=1 TO PATH_LEN(poses) DO
+      APPEND_NODE(out_poses,status)
+      out_poses[i].id = poses[i].id
+      out_poses[i].tool = poses[i].tool
+      out_poses[i].frame = poses[i].frame
+      `MOTION_DATA_FILE`__copy(poses[i].pose, out_poses[i].pose)
+    ENDFOR
+  END copy_cart_poses
+
+ROUTINE copy_joint_poses
+  VAR
+   i, status : INTEGER
+  BEGIN
+    FOR i=1 TO PATH_LEN(poses) DO
+      APPEND_NODE(out_poses,status)
+      out_poses[i].id = poses[i].id
+      out_poses[i].tool = poses[i].tool
+      out_poses[i].frame = poses[i].frame
+      `MOTION_DATA_FILE`__copy_joint(poses[i].pose, out_poses[i].pose)
+    ENDFOR
+
+  END copy_joint_poses
+
+ROUTINE multi_cart_poses
+  VAR
+    i : INTEGER
+  BEGIN
+    --if lists are different sizes dont multiply them
+    IF PATH_LEN(poses) <> PATH_LEN(poses2) THEN
+      karelError(ARR_LEN_MISMATCH, 'cartesian paths are a different size. Cant multiply together', ER_ABORT)
+    ENDIF
+
+    --multiply poses together
+    FOR i=1 TO PATH_LEN(poses) DO
+      poses[i].pose = `MOTION_DATA_FILE`__poseMul(poses[i].pose, poses2[i].pose)
+    ENDFOR
+
+  END multi_cart_poses
+
 
 BEGIN
 END class_name

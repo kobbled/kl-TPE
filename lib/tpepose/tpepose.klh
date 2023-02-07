@@ -33,5 +33,12 @@ declare_member(class_name,set_cart_pose,class_name,stcps)
 ROUTINE set_cart_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_TYPE) FROM class_name
 declare_member(class_name,set_joint_pose,class_name,stjps)
 ROUTINE set_joint_pose(TPE_name : STRING; pose_no: INTEGER; pose : MOTION_DATA_JOINT_TYPE) FROM class_name
+--position methods
+declare_member(class_name,copy_cart_poses,class_name,cppss)
+ROUTINE copy_cart_poses(poses : PATH NODEDATA = t_POSITION; out_poses : PATH NODEDATA = t_POSITION) FROM class_name
+declare_member(class_name,copy_joint_poses,class_name,cpjss)
+ROUTINE copy_joint_poses(poses : PATH NODEDATA = t_JPOSITION; out_poses : PATH NODEDATA = t_JPOSITION) FROM class_name
+declare_member(class_name,multi_cart_poses,class_name,mtcps)
+ROUTINE multi_cart_poses(poses : PATH NODEDATA = t_POSITION; poses2 : PATH NODEDATA = t_POSITION) FROM class_name
 
 %endif --end header

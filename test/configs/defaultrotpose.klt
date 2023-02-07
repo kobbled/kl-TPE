@@ -1,3 +1,5 @@
+%define CONFIG_FILENAME defaultrotpose.klt
+
 --robot group
 %define RBT_GRP 1
 --rotary group

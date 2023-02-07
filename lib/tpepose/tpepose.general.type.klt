@@ -6,6 +6,10 @@ TYPE
   t_POSEDATA FROM tpe = STRUCTURE
       xyz : XYZWPREXT
       joint : JOINTPOS
+      tool : SHORT
+      frame :SHORT
+    ENDSTRUCTURE
+
     ENDSTRUCTURE
 
 %endif -- tpe_pose_gen_type_t

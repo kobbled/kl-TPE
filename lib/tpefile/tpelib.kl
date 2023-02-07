@@ -11,8 +11,9 @@ VAR
   prgm_stats : ARRAY[10] OF hashname
 
 %from errors.klh %import CHK_STAT, karelError 
-%from strings.klh %import i_to_s
 %from pose.klh %import jpos_to_jpos6, jpos_to_jpos2
+%include strings.klh
+%include files.klh
 
 %include tpe.private.klh
 %include tpe.klh
@@ -56,7 +57,7 @@ ROUTINE tpe__open
     b : BOOLEAN
   BEGIN
     -- Open TPE program in read only
-    OPEN_TPE(TPE_name,TPE_RDACC, TPE_RDREJ, open_id, status)
+    OPEN_TPE(TPE_name,TPE_RWACC, TPE_RDREJ, open_id, status)
     
     --check status, abort if nessecary
     CHK_STAT(status)
@@ -110,6 +111,14 @@ ROUTINE tpe__get_open_id
 
     RETURN(p_stat)
   END tpe__get_open_id
+
+ROUTINE tpe__copy
+  VAR
+    status : INTEGER
+  BEGIN
+    COPY_TPE(TPE_name,new_name,TRUE,status)
+	  CHK_STAT(status)
+  END tpe__copy
 
 
 --get AR variables from TPE file

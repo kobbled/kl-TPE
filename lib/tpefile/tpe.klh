@@ -18,6 +18,8 @@ ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
 --retrieve openid if open
 declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
 ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRAMS FROM tpelib
+declare_function(prog_name,copy,prog_name_alias,copy)
+ROUTINE tpe__copy(TPE_name : STRING; new_name : STRING) FROM tpelib
 
 %include tpe.vars.klh
 

@@ -6,7 +6,14 @@ PROGRAM test_tpe
 %endif
 
 %define TEST_TPP_PROGRAM 'test_tpe_ls'
+%define COPY_TPP_PROGRAM 'test_tpe_cpy'
 
+%define TEST_TPP_PROGRAM2 'test_tpe_pos'
+
+%include systemvars.klt
+%include pathlib.klt
+--add for motion depencencies
+%include toolpath.structs.klt
 %include tpe.klt
 
 -- define system dependent position type t_NODE
@@ -26,21 +33,42 @@ set_position_type(tsttpe)
 
 VAR
   cart_poses : PATH nodedata = t_POSITION
+  cart_poses2 : PATH nodedata = t_POSITION
+  cart_offsets : PATH nodedata = t_POSITION
   jnt_poses : PATH nodedata = t_JPOSITION
+  motion_list : PATH nodedata = t_MOTIONSTAT
+  perch_pose : MOTION_DATA_JOINT_TYPE
+  mod_perch : MOTION_DATA_JOINT_TYPE
 
 %include tpe.klh
 %include kunit.klh
+%from math.klh %import srand, rand_range
 
 %ifdef DEBUG_BUILD
 %from display.klh %import clear, show
 %endif
 
 -- Robot pose implementation header
+-- > [!WARNING] Dont try to build the robotmotion class in the tpe module
+-- > currently it will only build in the motion module due to dependencies
+-- > only defining headers here!
 impl_motion_head(MOTION_DATA_FILE)
+
 
 %class tsttpe('tpepose.klc','tpepose.klh','defaultrotpose.klt')
 
 --clear
+
+ROUTINE clear_motion(p : PATH nodedata = t_MOTIONSTAT)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_motion
 
 ROUTINE clear_cart(p : PATH nodedata = t_POSITION)
   VAR
@@ -67,8 +95,37 @@ ROUTINE clear_joint(p : PATH nodedata = t_JPOSITION)
 ROUTINE clear_poses
   BEGIN
     clear_cart(cart_poses)
+    clear_cart(cart_poses2)
     clear_joint(jnt_poses)
+    clear_motion(motion_list)
+    clear_cart(cart_offsets)
   END clear_poses
+
+-- ********
+
+ROUTINE createOfsets(in_poses : PATH nodedata = t_POSITION; out_poses : PATH nodedata = t_POSITION)
+  VAR
+    i, status : INTEGER
+    s_tme  : STRING[16]
+    seed : INTEGER
+    offset : t_POSITION
+  BEGIN
+    --clear offsets
+    clear_cart(out_poses)
+
+    --set random seed
+    s_tme = '06-FEB-23 00:00'
+    CNV_STR_TIME(s_tme, seed)
+
+    --create offsets
+    FOR i = 1 TO PATH_LEN(in_poses) DO
+      APPEND_NODE(out_poses,status)
+      out_poses[i].id = in_poses[i].id
+      --apply a random tool offset
+      math__srand(seed*i)
+      out_poses[i].pose = `MOTION_DATA_FILE`__new_pose(0,0,math__rand_range(-5, 5),0,0,0, 0, (ZEROPOS(1).config_data))
+    ENDFOR
+  END createOfsets
 
 --test methods
 
@@ -78,17 +135,69 @@ ROUTINE t_gettpepos
     clear_poses
 
     tpe__open(TEST_TPP_PROGRAM)
+
+    --get positions from TPE
     tsttpe__get_cart_poses(TEST_TPP_PROGRAM, cart_poses)
     tsttpe__get_joint_poses(TEST_TPP_PROGRAM, jnt_poses)
+
     tpe__close(TEST_TPP_PROGRAM)
+
+    --copy cartesian positions to a new path
+    tsttpe__copy_cart_poses(cart_poses, cart_poses2)
+    --create tool offsets
+    createOfsets(cart_poses2, cart_offsets)
+    --multiply offsets
+    tsttpe__multi_cart_poses(cart_poses2, cart_offsets)
+
+    --copy tpe program
+      -- program must be closed before copying
+    tpe__copy(TEST_TPP_PROGRAM, COPY_TPP_PROGRAM)
+
+
+    tpe__open(COPY_TPP_PROGRAM)
+
+    --add offset position to the new file
+    set_tpe_poses(COPY_TPP_PROGRAM, cart_poses2, jnt_poses)
+    
+    tpe__close(COPY_TPP_PROGRAM)
+
+    
   END t_gettpepos
+
+ROUTINE t_setpos
+  BEGIN
+    tpe__open(TEST_TPP_PROGRAM2)
+
+    perch_pose = tsttpe__get_joint_pose(TEST_TPP_PROGRAM2, 1)
+    mod_perch = `MOTION_DATA_FILE`__new_joint(76.836, -6.150, -8.352, -157.122, 75.964, 102.112, 0)
+
+    tsttpe__set_joint_pose(TEST_TPP_PROGRAM2, 1, mod_perch)
+
+    tpe__close(TEST_TPP_PROGRAM2)
+  END t_setpos
+
+ROUTINE t_getmotion
+  BEGIN
+    -- clear motion list
+    clear_motion(motion_list)
+
+    --load file and read motion statements
+    tpe__open_file(TEST_TPP_PROGRAM)
+
+    tsttpe__get_motion_statements(motion_list)
+
+    tpe__close_file(TEST_TPP_PROGRAM)
+
+  END t_getmotion
 
 BEGIN
 %ifdef DEBUG_BUILD
   display__clear
 %endif
 
-  t_gettpepos
+  t_gettpepos -- get all poses from a tpp file, copy, and manipulate them in another program
+  t_getmotion -- retrieve motion statements from a tpp file
+  t_setpos -- get a single pose from a tpp file, and set it to something else
 
   kunit_done
 

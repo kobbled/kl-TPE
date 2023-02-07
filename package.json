@@ -25,7 +25,8 @@
   ],
   "tests" : [
     "test/test_tpe.kl",
-    "test/test_tpe_ls.tpp"
+    "test/test_tpe_ls.tpp",
+    "test/test_tpe_pos.tpp"
   ],
   "tests-includes" : [
     "test/configs"

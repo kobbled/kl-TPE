@@ -13,6 +13,7 @@ PROGRAM test_tpe
 %include systemvars.klt
 %include pathlib.klt
 --add for motion depencencies
+%include motion.deps.klt
 %include toolpath.structs.klt
 %include tpe.klt
 
@@ -48,11 +49,13 @@ VAR
 %from display.klh %import clear, show
 %endif
 
+%ifeq BUILD_ROBOT_INTERFACE TRUE
+--define robot motion interface
+robot_motion_define(MOTION_DATA_FILE,defaultrotpose.klt)
+%else
 -- Robot pose implementation header
--- > [!WARNING] Dont try to build the robotmotion class in the tpe module
--- > currently it will only build in the motion module due to dependencies
--- > only defining headers here!
 impl_motion_head(MOTION_DATA_FILE)
+%endif
 
 
 %class tsttpe('tpepose.klc','tpepose.klh','defaultrotpose.klt')

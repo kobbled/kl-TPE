@@ -11,7 +11,9 @@ VAR
   prgm_stats : ARRAY[10] OF hashname
   curr_prog : STRING[30]
   curr_line : STRING[128]
+  new_prog : STRING[30]
   tpefile : FILE
+  newfile : FILE
 
 %from errors.klh %import CHK_STAT, karelError 
 %from pose.klh %import jpos_to_jpos6, jpos_to_jpos2
@@ -104,7 +106,6 @@ ROUTINE tpe__close
 ROUTINE tpe__open_file
   VAR
     dstr : STRING[3]
-    i : INTEGER
   BEGIN
     curr_prog = 'MD:/'+to_upper(TPE_name)+'.LS'
     curr_line = ''
@@ -171,6 +172,97 @@ ROUTINE tpe__copy
     COPY_TPE(TPE_name,new_name,TRUE,status)
 	  CHK_STAT(status)
   END tpe__copy
+
+
+-- Write to TPE files
+-- *******************
+
+ROUTINE tpe__create
+  VAR
+    status : INTEGER
+  BEGIN
+    --create new TPE file
+    CREATE_TPE(name, PT_MNE_UNDEF, status)
+    --if program exists delete it and try again
+    IF status = TPE_PROGRAM_ALREADY_EXISTS THEN
+      DELETE_FILE('MD:/'+to_upper(name)+'.LS', FALSE, status)
+      CREATE_TPE(name, PT_MNE_UNDEF, status)
+    ENDIF
+    CHK_STAT(status)
+  END tpe__create
+
+
+ROUTINE tpe__create_ls
+  BEGIN
+    new_prog = 'MD:/'+to_upper(name)+'.LS'
+    files__open(new_prog, 'RW', newfile)
+
+    --write program name to file
+    curr_line = '/PROG ' + to_upper(name)
+    files__write_line(curr_line, new_prog, newfile)
+  END tpe__create_ls
+
+
+ROUTINE tpe__close_ls
+  BEGIN
+    files__close(new_prog, newfile)
+    --new_prog = ''
+  END tpe__close_ls
+
+
+ROUTINE tpe__copy_header_ls
+  VAR
+    dstr : STRING[3]
+    status : INTEGER
+  BEGIN
+    --open created TPE file to read through program
+    curr_prog = 'MD:/'+to_upper(TPE_Name)+'.LS'
+    files__open(curr_prog, 'RO', tpefile)
+
+    curr_line = ''
+    dstr = ''
+
+    --skip program name
+    files__read_line_ref(curr_prog, tpefile, curr_line)
+
+    --buffer until the start of the program
+    WHILE dstr <> '/MN' DO
+      files__read_line_ref(curr_prog, tpefile, curr_line)
+      dstr = SUB_STR(curr_line,1,3)
+      --Write the TPE file to the LS file up until the start of the program
+      files__write_line(curr_line, new_prog, newfile)
+    ENDWHILE
+    --write /MN to start the program
+    files__write_line('/MN', new_prog, newfile)
+
+    --close the TPE file
+    files__close(curr_prog, tpefile)
+    curr_prog = ''
+    curr_line = ''
+
+  END tpe__copy_header_ls
+
+
+ROUTINE tpe__write_end
+  BEGIN
+    files__write_line('/POS', new_prog, newfile)
+    files__write_line('/END', new_prog, newfile)
+  END tpe__write_end
+
+ROUTINE tpe__write_pause
+  BEGIN
+    files__write_line(':  PAUSE ;', new_prog, newfile)
+  END tpe__write_pause
+
+ROUTINE tpe__write_uframe
+  BEGIN
+    files__write_line(':  UFRAME_NUM='+ i_to_s(num) +' ;', new_prog, newfile)
+  END tpe__write_uframe
+
+ROUTINE tpe__write_utool
+  BEGIN
+    files__write_line(':  UTOOL_NUM='+ i_to_s(num) +' ;', new_prog, newfile)
+  END tpe__write_utool
 
 
 --get AR variables from TPE file

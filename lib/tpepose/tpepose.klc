@@ -673,5 +673,17 @@ ROUTINE multi_cart_poses
   END multi_cart_poses
 
 
+--write to LS files
+
+ROUTINE set_tpe_groups
+  VAR
+    str : STRING[1]
+    status : INTEGER
+  BEGIN
+    SET_ATTR_PRG(name, AT_DEF_GROUP, CELL_GRPMASK, str, status)
+    CHK_STAT(status)
+  END set_tpe_groups
+
+
 BEGIN
 END class_name

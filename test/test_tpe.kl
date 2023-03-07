@@ -21,7 +21,6 @@ PROGRAM test_tpe
 -- [!IMPORTANT] this must be defined in a template file
 -- see test examples.
 %include defaultrotpose.klt
-
 %ifdef motion_type
 motion_type(MOTION_DATA_FILE)
 %endif
@@ -189,7 +188,7 @@ ROUTINE t_getmotion
 
     tsttpe__get_motion_statements(motion_list)
 
-    tpe__close_file(TEST_TPP_PROGRAM)
+    tpe__close_file
 
   END t_getmotion
 

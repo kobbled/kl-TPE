@@ -54,4 +54,9 @@ ROUTINE copy_joint_poses(poses : PATH NODEDATA = t_JPOSITION; out_poses : PATH N
 declare_member(class_name,multi_cart_poses,class_name,mtcps)
 ROUTINE multi_cart_poses(poses : PATH NODEDATA = t_POSITION; poses2 : PATH NODEDATA = t_POSITION) FROM class_name
 
+-- write to LS file
+declare_member(class_name,set_tpe_groups,class_name,sttpg)
+ROUTINE set_tpe_groups(name : STRING) FROM class_name
+
+
 %endif --end header

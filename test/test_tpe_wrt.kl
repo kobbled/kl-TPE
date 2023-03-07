@@ -1,0 +1,121 @@
+PROGRAM test_tpe_wrt
+%NOLOCKGROUP
+
+%define TPP_WRITE_PROG 'new_prog'
+%define TEST_TPP_PROGRAM 'test_tpe_ls'
+%define TEST_TPP_COPY 'test_tpe_crt'
+
+%include tpe.klt
+
+%include systemvars.klt
+%include pathlib.klt
+--add for motion depencencies
+%include motion.deps.klt
+%include toolpath.structs.klt
+%include tpe.klt
+
+-- define system dependent position type t_NODE
+-- [!IMPORTANT] this must be defined in a template file
+-- see test examples.
+%include defaultrotpose.klt
+%ifdef motion_type
+motion_type(MOTION_DATA_FILE)
+%endif
+
+--tpe specific types
+%include tpepose.general.type.klt
+
+%include tpepose.system.type.klt
+set_position_type(tsttpe)
+
+VAR
+  cart_poses : PATH nodedata = t_POSITION
+  jnt_poses : PATH nodedata = t_JPOSITION
+  motion_list : PATH nodedata = t_MOTIONSTAT
+
+%include tpe.klh
+%include kunit.klh
+
+%ifeq BUILD_ROBOT_INTERFACE TRUE
+--define robot motion interface
+robot_motion_define(MOTION_DATA_FILE,defaultrotpose.klt)
+%else
+-- Robot pose implementation header
+impl_motion_head(MOTION_DATA_FILE)
+%endif
+
+%class tsttpe('tpepose.klc','tpepose.klh','defaultrotpose.klt')
+
+--clear
+
+ROUTINE clear_motion(p : PATH nodedata = t_MOTIONSTAT)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_motion
+
+ROUTINE clear_cart(p : PATH nodedata = t_POSITION)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_cart
+
+ROUTINE clear_joint(p : PATH nodedata = t_JPOSITION)
+  VAR
+    i, status : INTEGER
+  BEGIN
+    i = PATH_LEN(p)
+    WHILE PATH_LEN(p) > 0 DO
+		  DELETE_NODE(p,i,status)
+      i = i - 1
+	  ENDWHILE
+  END clear_joint
+
+ROUTINE clear_poses
+  BEGIN
+    clear_cart(cart_poses)
+    clear_joint(jnt_poses)
+    clear_motion(motion_list)
+  END clear_poses
+
+-- ********
+
+BEGIN
+  --clear data
+  clear_poses
+
+  --fill struct for motions
+
+
+  --fill structs for positions
+
+
+  --create blank template
+  tpe__create(TPP_WRITE_PROG)
+  --change group mask
+  set_tpe_groups(TPP_WRITE_PROG)
+
+  --write to LS file
+  tpe__create_ls(TEST_TPP_COPY)
+  tpe__copy_header_ls(TPP_WRITE_PROG)
+
+  --insert program here
+  tpe__write_pause
+
+  --write end of file
+  tpe__write_end
+  
+  --close ls file
+  tpe__close_ls
+
+END test_tpe_wrt

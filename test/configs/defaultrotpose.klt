@@ -3,7 +3,7 @@
 --..IMPORTANT:: Set to true if you want to build the robot pose implementation
 --              For example if you have built this implementation from pathmotion
 --              you may not want to rebuild it, which could cause linking errors
-%define BUILD_ROBOT_INTERFACE TRUE
+%define BUILD_ROBOT_INTERFACE FALSE
 
 --robot group
 %define RBT_GRP 1

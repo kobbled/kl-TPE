@@ -18,7 +18,7 @@ ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,open_file,prog_name_alias,opnfl)
 ROUTINE tpe__open_file(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,close_file,prog_name_alias,clsfl)
-ROUTINE tpe__close_file(TPE_name : STRING) FROM tpelib
+ROUTINE tpe__close_file FROM tpelib
 declare_function(prog_name,sanitize_line,prog_name_alias,sanln)
 ROUTINE tpe__sanitize_line FROM tpelib
 --retrieve openid if open
@@ -26,6 +26,25 @@ declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
 ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRAMS FROM tpelib
 declare_function(prog_name,copy,prog_name_alias,copy)
 ROUTINE tpe__copy(TPE_name : STRING; new_name : STRING) FROM tpelib
+--write tpe
+declare_function(prog_name,create,prog_name_alias,create)
+ROUTINE tpe__create(name : STRING) FROM tpelib
+declare_function(prog_name,create_ls,prog_name_alias,cretls)
+ROUTINE tpe__create_ls(name : STRING) FROM tpelib
+declare_function(prog_name,close_ls,prog_name_alias,clsls)
+ROUTINE tpe__close_ls FROM tpelib
+
+declare_function(prog_name,copy_header_ls,prog_name_alias,cpyhdr)
+ROUTINE tpe__copy_header_ls(TPE_Name : STRING) FROM tpelib
+
+declare_function(prog_name,write_pause,prog_name_alias,wrtpas)
+ROUTINE tpe__write_pause FROM tpelib
+declare_function(prog_name,write_uframe,prog_name_alias,wrufrm)
+ROUTINE tpe__write_uframe(num : INTEGER) FROM tpelib
+declare_function(prog_name,write_utool,prog_name_alias,wrutol)
+ROUTINE tpe__write_utool(num : INTEGER) FROM tpelib
+declare_function(prog_name,write_end,prog_name_alias,wrtend)
+ROUTINE tpe__write_end FROM tpelib
 
 %include tpe.vars.klh
 

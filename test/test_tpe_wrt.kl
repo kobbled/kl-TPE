@@ -94,10 +94,20 @@ BEGIN
   --clear data
   clear_poses
 
-  --fill struct for motions
 
+  --get data from LS file
+  tpe__open(TEST_TPP_PROGRAM)
+  tpe__open_file(TEST_TPP_PROGRAM)
+
+  --fill struct for motions
+  tsttpe__get_motion_statements(motion_list)
 
   --fill structs for positions
+  tsttpe__get_cart_poses(TEST_TPP_PROGRAM, cart_poses)
+  tsttpe__get_joint_poses(TEST_TPP_PROGRAM, jnt_poses)
+
+  tpe__close_file
+  tpe__close(TEST_TPP_PROGRAM)
 
 
   --create blank template
@@ -105,7 +115,7 @@ BEGIN
   --change group mask
   set_tpe_groups(TPP_WRITE_PROG)
 
-  --write to LS file
+  --write to new LS file
   tpe__create_ls(TEST_TPP_COPY)
   tpe__copy_header_ls(TPP_WRITE_PROG)
 
@@ -114,8 +124,11 @@ BEGIN
 
   --write end of file
   tpe__write_end
-  
+
   --close ls file
   tpe__close_ls
+
+  -- --add positions to new LS file
+  -- set_tpe_poses(TPP_WRITE_PROG, cart_poses, jnt_poses)
 
 END test_tpe_wrt

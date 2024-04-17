@@ -1,0 +1,17 @@
+PROGRAM tpe_exists
+%NOBUSYLAMP
+%NOLOCKGROUP
+
+VAR
+	out_reg : INTEGER
+	TPE_Name : STRING[32]
+%include tpe.vars.klh
+%from registers.klh %import set_boolean
+%from pose.klh %import get_posreg_xyz, get_posreg_joint, set_posreg_xyz, set_posreg_joint, set_vector_to_posreg
+%from tpe.klh %import ls_exists
+
+BEGIN
+	TPE_Name = tpe__get_string_arg(1)
+	out_reg = tpe__get_int_arg(2)
+	registers__set_boolean(out_reg, tpe__ls_exists(TPE_Name))
+END tpe_exists

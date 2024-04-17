@@ -35,5 +35,8 @@
   "tests-depends" : [
     "KUnit"
   ],
+  "tp-interfaces" : [
+    {"routine" : "tpe__ls_exists", "program_name" : "tpe_exists"}
+  ],
   "macros" : ["DEBUG_BUILD=TRUE"]
 }

@@ -34,6 +34,10 @@ ROUTINE tpe__create_ls(name : STRING) FROM tpelib
 declare_function(prog_name,close_ls,prog_name_alias,clsls)
 ROUTINE tpe__close_ls FROM tpelib
 
+declare_function(prog_name,pns_name,prog_name_alias,pnsname)
+ROUTINE tpe__pns_name(prefix : STRING; number : INTEGER) : STRING FROM tpelib
+declare_function(prog_name,ls_exists,prog_name_alias,lsexists)
+ROUTINE tpe__ls_exists(TPE_Name : STRING) : BOOLEAN FROM tpelib
 declare_function(prog_name,copy_header_ls,prog_name_alias,cpyhdr)
 ROUTINE tpe__copy_header_ls(TPE_Name : STRING) FROM tpelib
 

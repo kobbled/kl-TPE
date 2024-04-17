@@ -1,0 +1,19 @@
+PROGRAM tpe_name
+%NOBUSYLAMP
+%NOLOCKGROUP
+
+VAR
+	out_reg : INTEGER
+	prefix : STRING[32]
+	number : INTEGER
+%include tpe.vars.klh
+%from registers.klh %import set_string
+%from pose.klh %import get_posreg_xyz, get_posreg_joint, set_posreg_xyz, set_posreg_joint, set_vector_to_posreg
+%from tpe.klh %import pns_name
+
+BEGIN
+	prefix = tpe__get_string_arg(1)
+	number = tpe__get_int_arg(2)
+	out_reg = tpe__get_int_arg(3)
+	registers__set_string(out_reg, tpe__pns_name(prefix,number))
+END tpe_name

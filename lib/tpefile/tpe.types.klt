@@ -6,7 +6,7 @@
 TYPE
   --static type for dictionary. `hash_tpeprog.klt` is needed
   --to create from the hash module, even though this is copied.
-  TPEPROGRAMS FROM TPE_DICTIONARY_FILENAME = STRUCTURE
+  TPEPROGRM FROM TPE_DICTIONARY_FILENAME = STRUCTURE
     open_id : INTEGER
     status : INTEGER
   ENDSTRUCTURE

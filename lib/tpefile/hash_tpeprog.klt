@@ -4,7 +4,7 @@
 %mode string QQQ "`" "`" "\\"
 %define hash_type_define(obj_name) `TYPE
   -- 8 Bytes
-  TPEPROGRAMS FROM obj_name = STRUCTURE
+  TPEPROGRM FROM obj_name = STRUCTURE
     open_id : INTEGER
     status : INTEGER
   ENDSTRUCTURE`
@@ -12,5 +12,5 @@
 
 --declare hash for TPEPROGRAMS
 %defeval hashname dict
-%defeval hval_def TPEPROGRAMS
-%defeval hval_type TPEPROGRAMS
+%defeval hval_def TPEPROGRM
+%defeval hval_type TPEPROGRM

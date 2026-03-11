@@ -23,7 +23,7 @@ declare_function(prog_name,sanitize_line,prog_name_alias,sanln)
 ROUTINE tpe__sanitize_line FROM tpelib
 --retrieve openid if open
 declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
-ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRAMS FROM tpelib
+ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRM FROM tpelib
 declare_function(prog_name,copy,prog_name_alias,copy)
 ROUTINE tpe__copy(TPE_name : STRING; new_name : STRING) FROM tpelib
 --write tpe
@@ -49,6 +49,9 @@ declare_function(prog_name,write_utool,prog_name_alias,wrutol)
 ROUTINE tpe__write_utool(num : INTEGER) FROM tpelib
 declare_function(prog_name,write_end,prog_name_alias,wrtend)
 ROUTINE tpe__write_end FROM tpelib
+
+declare_function(prog_name,write_line,prog_name_alias,wrtlin)
+ROUTINE tpe__write_line(str : STRING) FROM tpelib
 
 %include tpe.vars.klh
 

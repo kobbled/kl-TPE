@@ -84,7 +84,7 @@ ROUTINE tpe__open
 
 ROUTINE tpe__close
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     status : INTEGER
     b : BOOLEAN
   BEGIN
@@ -153,7 +153,7 @@ ROUTINE tpe__sanitize_line
 
 ROUTINE tpe__get_open_id
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     b : BOOLEAN
   BEGIN
     --see if file is already open
@@ -288,6 +288,11 @@ ROUTINE tpe__write_utool
   BEGIN
     files__write_line(':  UTOOL_NUM='+ i_to_s(num) +' ;', new_prog, newfile)
   END tpe__write_utool
+
+ROUTINE tpe__write_line
+  BEGIN
+    files__write_line(str, new_prog, newfile)
+  END tpe__write_line
 
 
 --get AR variables from TPE file

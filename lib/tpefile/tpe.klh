@@ -15,6 +15,10 @@ declare_function(prog_name,open,prog_name_alias,open)
 ROUTINE tpe__open(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,close,prog_name_alias,close)
 ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,delete,prog_name_alias,delete)
+ROUTINE tpe__delete(TPE_name : STRING) FROM tpelib
+declare_function(prog_name,delete_pattern,prog_name_alias,delpat)
+ROUTINE tpe__delete_pattern(TPE_prefix : STRING) FROM tpelib
 declare_function(prog_name,open_file,prog_name_alias,opnfl)
 ROUTINE tpe__open_file(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,close_file,prog_name_alias,clsfl)

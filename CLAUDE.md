@@ -165,6 +165,8 @@ All prefixed `tpe__`.
 | `tpe__destructor` | `()` | Same as constructor — clears hash. Call at shutdown. |
 | `tpe__open` | `(TPE_name : STRING)` | `OPEN_TPE(RW access)`, stores open_id in hash. Aborts on error. |
 | `tpe__close` | `(TPE_name : STRING)` | `CLOSE_TPE`, removes from hash. Warns if not open. |
+| `tpe__delete` | `(TPE_name : STRING)` | Closes the program first if open, then deletes both `MD:/NAME.LS` and `MD:/NAME.TP`. Silent if either file does not exist. |
+| `tpe__delete_pattern` | `(pattern : STRING)` | Wildcard delete — pattern may include `*` (e.g. `'TMPS_CYLGEN*'`). Removes all matching `MD:/PATTERN.LS` and `MD:/PATTERN.TP`. **Precondition:** no matching program may be currently open via `tpe__open` — the hash class has no iteration so this cannot be auto-closed; an open `.TP` will cause `DELETE_FILE` to abort. |
 | `tpe__get_open_id` | `(TPE_name : STRING) : TPEPROGRM` | Returns stored `{open_id, status}` from hash. Warns if not open. |
 
 #### LS File I/O

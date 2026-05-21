@@ -103,6 +103,36 @@ ROUTINE tpe__close
 
   END tpe__close
 
+ROUTINE tpe__delete
+  VAR
+    p_stat : TPEPROGRM
+    upper_name : STRING[30]
+    b : BOOLEAN
+  BEGIN
+    --if program is currently open, close it first to keep the hash consistent
+    b = `TPE_DICTIONARY_FILENAME`__get(TPE_name, p_stat, 'tpelib', 'prgm_stats')
+    IF b THEN
+      tpe__close(TPE_name)
+    ENDIF
+
+    upper_name = to_upper(TPE_name)
+    files__delete('MD:/' + upper_name + '.LS')
+    files__delete('MD:/' + upper_name + '.TP')
+  END tpe__delete
+
+ROUTINE tpe__delete_pattern
+  VAR
+    upper_name : STRING[30]
+  BEGIN
+    --pattern may include the * wildcard, e.g. 'TMPS_CYLGEN*'
+    --caller must ensure no matching programs are currently open via tpe__open;
+    --DELETE_FILE will return a non-"not found" status for any open .TP,
+    --which files__delete propagates as an abort.
+    upper_name = to_upper(TPE_prefix)
+    files__delete('MD:/' + upper_name + '*.LS')
+    files__delete('MD:/' + upper_name + '*.TP')
+  END tpe__delete_pattern
+
 ROUTINE tpe__open_file
   VAR
     dstr : STRING[3]
@@ -185,7 +215,7 @@ ROUTINE tpe__create
     CREATE_TPE(name, PT_MNE_UNDEF, status)
     --if program exists delete it and try again
     IF status = TPE_PROGRAM_ALREADY_EXISTS THEN
-      DELETE_FILE('MD:/'+to_upper(name)+'.LS', FALSE, status)
+      files__delete('MD:/'+to_upper(name)+'.LS')
       CREATE_TPE(name, PT_MNE_UNDEF, status)
     ENDIF
     CHK_STAT(status)

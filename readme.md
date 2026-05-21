@@ -110,6 +110,23 @@ tpe__close(TPE_name : STRING)
   -- Close open program via CLOSE_TPE(). Removes from hash.
   -- Warns (non-fatal) if program was not open.
 
+tpe__delete(TPE_name : STRING)
+  -- Closes the program first if currently open, then deletes both
+  -- MD:/NAME.LS and MD:/NAME.TP from the controller. Non-fatal if
+  -- either file is missing.
+
+tpe__delete_pattern(pattern : STRING)
+  -- Wildcard delete. `pattern` may include the * wildcard, e.g.
+  -- 'TMPS_CYLGEN*' to remove TMPS_CYLGEN1, TMPS_CYLGEN10, ... in one
+  -- call. Removes both MD:/PATTERN.LS and MD:/PATTERN.TP for every
+  -- match.
+  --
+  -- Precondition: no matching program may be currently open via
+  -- tpe__open. The hash class has no key iteration, so the wildcard
+  -- form cannot auto-close matches the way tpe__delete does for an
+  -- exact name. An open .TP will cause DELETE_FILE to return a
+  -- non-"not found" status and abort.
+
 tpe__get_open_id(TPE_name : STRING) : TPEPROGRM
   -- Retrieve stored {open_id, status} for an open program.
   -- Warns if program is not in hash.

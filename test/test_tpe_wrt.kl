@@ -2,6 +2,7 @@ PROGRAM test_tpe_wrt
 %NOLOCKGROUP
 
 %define TPP_WRITE_PROG 'new_prog'
+%define TPP_WRITE_PROG2 'prog_del'
 %define TEST_TPP_PROGRAM 'test_tpe_ls'
 %define TEST_TPP_COPY 'test_tpe_crt'
 
@@ -32,8 +33,10 @@ VAR
   cart_poses : PATH nodedata = t_POSITION
   jnt_poses : PATH nodedata = t_JPOSITION
   motion_list : PATH nodedata = t_MOTIONSTAT
+  scratch_fl : FILE
 
 %include tpe.klh
+%include files.klh
 %include kunit.klh
 
 %ifeq BUILD_ROBOT_INTERFACE TRUE
@@ -130,5 +133,45 @@ BEGIN
 
   -- --add positions to new LS file
   -- set_tpe_poses(TPP_WRITE_PROG, cart_poses, jnt_poses)
+
+  --### delete tests ###
+
+  --tpe__delete on a nonexistent program should be silent
+  tpe__delete('NO_SUCH')
+  kunit_test('tpe__delete swallows missing file', TRUE)
+
+  --tpe__delete on the just-created TPP_WRITE_PROG should remove the .TP
+  tpe__delete(TPP_WRITE_PROG2)
+  kunit_test('tpe__delete removes .TP', NOT tpe__ls_exists(TPP_WRITE_PROG))
+
+  --tpe__delete should also work when the program is currently open
+  tpe__create(TPP_WRITE_PROG2)
+  tpe__open(TPP_WRITE_PROG2)
+  tpe__delete(TPP_WRITE_PROG2)
+  kunit_test('tpe__delete handles open program', NOT tpe__ls_exists(TPP_WRITE_PROG))
+
+  --files__delete on a scratch file should not abort, and a second call
+  --against the now-missing file is also safe
+  files__create('MD:/TPESCRTCH.DT', scratch_fl)
+  files__delete('MD:/TPESCRTCH.DT')
+  files__delete('MD:/TPESCRTCH.DT')
+  kunit_test('files__delete is idempotent', TRUE)
+
+  --### wildcard delete tests ###
+
+  --batch-create three programs sharing a prefix, then wipe with one wildcard call
+  tpe__create('TMPS_DELP1')
+  tpe__create('TMPS_DELP2')
+  tpe__create('TMPS_DELP3')
+  tpe__delete_pattern('TMPS_DELP*')
+  kunit_test('tpe__delete_pattern removes TMPS_DELP1', NOT tpe__ls_exists('TMPS_DELP1'))
+  kunit_test('tpe__delete_pattern removes TMPS_DELP2', NOT tpe__ls_exists('TMPS_DELP2'))
+  kunit_test('tpe__delete_pattern removes TMPS_DELP3', NOT tpe__ls_exists('TMPS_DELP3'))
+
+  --no-match wildcard should be silent (file-not-found status is swallowed)
+  tpe__delete_pattern('NO_MATCH_PREFIX*')
+  kunit_test('tpe__delete_pattern swallows no-match', TRUE)
+
+  kunit_done
 
 END test_tpe_wrt

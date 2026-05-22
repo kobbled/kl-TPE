@@ -30,12 +30,13 @@ motion_type(MOTION_DATA_FILE)
 set_position_type(tsttpe)
 
 VAR
+  b : BOOLEAN
   cart_poses : PATH nodedata = t_POSITION
   jnt_poses : PATH nodedata = t_JPOSITION
   motion_list : PATH nodedata = t_MOTIONSTAT
   scratch_fl : FILE
 
-%include tpe.klh
+%from tpe.klh %import open, open_file, close, close_file, close_ls, create, create_ls, copy_header_ls, write_pause, write_end, delete, delete_pattern, ls_exists
 %include files.klh
 %include kunit.klh
 
@@ -152,7 +153,7 @@ BEGIN
 
   --files__delete on a scratch file should not abort, and a second call
   --against the now-missing file is also safe
-  files__create('MD:/TPESCRTCH.DT', scratch_fl)
+  b = files__create('MD:/TPESCRTCH.DT', scratch_fl)
   files__delete('MD:/TPESCRTCH.DT')
   files__delete('MD:/TPESCRTCH.DT')
   kunit_test('files__delete is idempotent', TRUE)

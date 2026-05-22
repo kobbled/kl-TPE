@@ -40,9 +40,9 @@ VAR
   perch_pose : MOTION_DATA_JOINT_TYPE
   mod_perch : MOTION_DATA_JOINT_TYPE
 
-%include tpe.klh
 %include kunit.klh
 %from math.klh %import srand, rand_range
+%from tpe.klh %import open, close, copy, open_file, close_file
 
 %ifdef DEBUG_BUILD
 %from display.klh %import clear, show

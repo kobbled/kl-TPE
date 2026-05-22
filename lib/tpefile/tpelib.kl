@@ -5,7 +5,7 @@ PROGRAM tpelib
 
 --hash struct
 %include hash_tpeprog.klt
-t_hash(hashname,hval_def,TPE_DICTIONARY_FILENAME)
+t_hash(hashname,TPEPROGRM,TPE_DICTIONARY_FILENAME)
 
 VAR
   prgm_stats : ARRAY[10] OF hashname
@@ -37,7 +37,7 @@ END tpelib
 -- ***********
 ROUTINE tpe__constructor
   VAR
-    empty : hval_def
+    empty : TPEPROGRM
     b : BOOLEAN
   BEGIN
     empty.open_id = 0 ; empty.status = 0 ;
@@ -47,7 +47,7 @@ ROUTINE tpe__constructor
 
 ROUTINE tpe__destructor
   VAR
-    empty  : hval_def
+    empty  : TPEPROGRM
     b : BOOLEAN
   BEGIN
     empty.open_id = 0 ; empty.status = 0 ;
@@ -57,7 +57,7 @@ ROUTINE tpe__destructor
 
 ROUTINE tpe__open
   VAR
-    p_stat : hval_def
+    p_stat : TPEPROGRM
     open_id, status : INTEGER
     b : BOOLEAN
   BEGIN

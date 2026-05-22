@@ -222,7 +222,7 @@ ROUTINE get_pose_grp
   VAR
     posn_typ, num_axs : INTEGER
     utool, uframe : INTEGER
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     status : INTEGER
   BEGIN
     -- get open id of prog
@@ -258,7 +258,7 @@ ROUTINE get_pose_grp
 
 ROUTINE get_cart_pose
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     p : MOTION_DATA_TYPE
     b : BOOLEAN
   BEGIN
@@ -273,7 +273,7 @@ ROUTINE get_cart_pose
 
 ROUTINE get_joint_pose
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     p : MOTION_DATA_JOINT_TYPE
     b : BOOLEAN
   BEGIN
@@ -288,7 +288,7 @@ ROUTINE get_joint_pose
 
 ROUTINE get_last_pose_index
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
   BEGIN
     p_stat = tpe__get_open_id(TPE_name)
 
@@ -297,7 +297,7 @@ ROUTINE get_last_pose_index
 
 ROUTINE get_cart_poses
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     pos : t_POSITION
     i : INTEGER
     last_pose : INTEGER
@@ -334,7 +334,7 @@ ROUTINE get_cart_poses
 
 ROUTINE get_joint_poses
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     pos : t_JPOSITION
     i : INTEGER
     last_pose : INTEGER
@@ -574,7 +574,7 @@ ROUTINE get_motion_statements
 
 ROUTINE set_cart_pose
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     status : INTEGER
   BEGIN
     p_stat = tpe__get_open_id(TPE_name)
@@ -593,7 +593,7 @@ ROUTINE set_cart_pose
 
 ROUTINE set_joint_pose
   VAR
-    p_stat : TPEPROGRAMS
+    p_stat : TPEPROGRM
     status : INTEGER
   BEGIN
     p_stat = tpe__get_open_id(TPE_name)

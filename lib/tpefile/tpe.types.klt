@@ -3,12 +3,11 @@
 
 %defeval TPE_DICTIONARY_FILENAME tpelog
 
-TYPE
-  --static type for dictionary. `hash_tpeprog.klt` is needed
-  --to create from the hash module, even though this is copied.
-  TPEPROGRM FROM TPE_DICTIONARY_FILENAME = STRUCTURE
-    open_id : INTEGER
-    status : INTEGER
-  ENDSTRUCTURE
+-- TPEPROGRM struct body lives in hash_tpeprog.klt's hash_type_define macro.
+-- Expand it here with TPE_DICTIONARY_FILENAME as the owning program so the
+-- import-style declaration in this file stays in lock-step with the owning
+-- declaration the hash class template emits inside tpelog.
+%include hash_tpeprog.klt
+hash_type_define(TPE_DICTIONARY_FILENAME)
 
 %endif

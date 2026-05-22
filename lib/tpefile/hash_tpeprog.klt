@@ -1,3 +1,6 @@
+%ifndef hash_tpeprog_t
+%define hash_tpeprog_t
+
 %include define_type.m
 
 %mode push
@@ -14,3 +17,5 @@
 %defeval hashname dict
 %defeval hval_def TPEPROGRM
 %defeval hval_type TPEPROGRM
+
+%endif --hash_tpeprog_t

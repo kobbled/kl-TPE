@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import PyPDF2; r=PyPDF2.PdfReader\\(r'C:\\\\Users\\\\MattDewar\\\\OneDrive\\\\OneDrive - Group Six Technologies Inc\\\\Programing\\\\Reference Guides\\\\karel reference.pdf'\\); print\\(len\\(r.pages\\)\\)\")",
+      "Bash(python -c \"import pypdf; r=pypdf.PdfReader\\(r'C:\\\\Users\\\\MattDewar\\\\OneDrive\\\\OneDrive - Group Six Technologies Inc\\\\Programing\\\\Reference Guides\\\\karel reference.pdf'\\); print\\(len\\(r.pages\\)\\)\")",
+      "Bash(python -c \"import pdfplumber; pdf=pdfplumber.open\\(r'C:\\\\Users\\\\MattDewar\\\\OneDrive\\\\OneDrive - Group Six Technologies Inc\\\\Programing\\\\Reference Guides\\\\karel reference.pdf'\\); print\\(len\\(pdf.pages\\)\\)\")",
+      "Bash(python *)",
+      "Bash(git *)",
+      "Bash(grep -E \"\\\\.\\(m|klt|kl|klh\\)$\")"
+    ]
+  }
+}

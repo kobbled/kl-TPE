@@ -12,7 +12,7 @@ ROUTINE tpe__constructor FROM tpelib
 declare_function(prog_name,destructor,prog_name_alias,dsct)
 ROUTINE tpe__destructor FROM tpelib
 declare_function(prog_name,open,prog_name_alias,open)
-ROUTINE tpe__open(TPE_name : STRING) FROM tpelib
+ROUTINE tpe__open(TPE_name : STRING) : INTEGER FROM tpelib
 declare_function(prog_name,close,prog_name_alias,close)
 ROUTINE tpe__close(TPE_name : STRING) FROM tpelib
 declare_function(prog_name,delete,prog_name_alias,delete)
@@ -27,7 +27,7 @@ declare_function(prog_name,sanitize_line,prog_name_alias,sanln)
 ROUTINE tpe__sanitize_line FROM tpelib
 --retrieve openid if open
 declare_function(prog_name,get_open_id,prog_name_alias,gtopid)
-ROUTINE tpe__get_open_id(TPE_name : STRING) : TPEPROGRM FROM tpelib
+ROUTINE tpe__get_open_id(TPE_name : STRING) : INTEGER FROM tpelib
 declare_function(prog_name,copy,prog_name_alias,copy)
 ROUTINE tpe__copy(TPE_name : STRING; new_name : STRING) FROM tpelib
 --write tpe

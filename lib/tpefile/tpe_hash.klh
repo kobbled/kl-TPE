@@ -1,0 +1,13 @@
+%ifndef tpe_hash_h
+%define tpe_hash_h
+
+%include namespace.m
+
+%define prog_name tpe
+%define prog_name_alias tpe
+
+--retrieve openid if open
+declare_function(prog_name,get_tpeprogram,prog_name_alias,gttpstat)
+ROUTINE tpe__get_tpeprogram(TPE_name : STRING) : TPEPROGRM FROM tpelib
+
+%endif --tpe_hash_h

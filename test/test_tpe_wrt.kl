@@ -35,6 +35,7 @@ VAR
   jnt_poses : PATH nodedata = t_JPOSITION
   motion_list : PATH nodedata = t_MOTIONSTAT
   scratch_fl : FILE
+  open_id : INTEGER
 
 %from tpe.klh %import open, open_file, close, close_file, close_ls, create, create_ls, copy_header_ls, write_pause, write_end, delete, delete_pattern, ls_exists
 %include files.klh
@@ -100,7 +101,7 @@ BEGIN
 
 
   --get data from LS file
-  tpe__open(TEST_TPP_PROGRAM)
+  open_id = tpe__open(TEST_TPP_PROGRAM)
   tpe__open_file(TEST_TPP_PROGRAM)
 
   --fill struct for motions
@@ -147,7 +148,7 @@ BEGIN
 
   --tpe__delete should also work when the program is currently open
   tpe__create(TPP_WRITE_PROG2)
-  tpe__open(TPP_WRITE_PROG2)
+  open_id = tpe__open(TPP_WRITE_PROG2)
   tpe__delete(TPP_WRITE_PROG2)
   kunit_test('tpe__delete handles open program', NOT tpe__ls_exists(TPP_WRITE_PROG))
 

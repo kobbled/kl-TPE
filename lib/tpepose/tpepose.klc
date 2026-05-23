@@ -65,6 +65,7 @@ set_position_type(class_name)
 %include strings.klh
 %from files.klh %import read_line_ref
 %include tpe.klh
+%include tpe_hash.klh
 
 %ifdef DEBUG_BUILD
 %from display.klh %import clear, show
@@ -226,7 +227,7 @@ ROUTINE get_pose_grp
     status : INTEGER
   BEGIN
     -- get open id of prog
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     -- get pose type
     GET_POS_TYP(p_stat.open_id, pose_no, grp_no, posn_typ, num_axs, status)
@@ -263,7 +264,7 @@ ROUTINE get_cart_pose
     b : BOOLEAN
   BEGIN
     -- get open id of prog
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     b = getcartpos_(p_stat.open_id, pose_no, p)
 
@@ -278,7 +279,7 @@ ROUTINE get_joint_pose
     b : BOOLEAN
   BEGIN
     -- get open id of prog
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     b = getjointpos_(p_stat.open_id, pose_no, p)
 
@@ -290,7 +291,7 @@ ROUTINE get_last_pose_index
   VAR
     p_stat : TPEPROGRM
   BEGIN
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     RETURN(lastposidx_(p_stat.open_id, 1))
   END get_last_pose_index
@@ -305,7 +306,7 @@ ROUTINE get_cart_poses
     status : INTEGER
     b : BOOLEAN
   BEGIN
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     -- get last index
     last_pose = lastposidx_(p_stat.open_id, 1)
@@ -342,7 +343,7 @@ ROUTINE get_joint_poses
     status : INTEGER
     b : BOOLEAN
   BEGIN
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
     -- get last index
     last_pose = lastposidx_(p_stat.open_id, 1)
@@ -577,7 +578,7 @@ ROUTINE set_cart_pose
     p_stat : TPEPROGRM
     status : INTEGER
   BEGIN
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
 %ifdef MOTION_TYPE_ATTR1
     SET_POS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR1, status, RBT_GRP)
@@ -596,7 +597,7 @@ ROUTINE set_joint_pose
     p_stat : TPEPROGRM
     status : INTEGER
   BEGIN
-    p_stat = tpe__get_open_id(TPE_name)
+    p_stat = tpe__get_tpeprogram(TPE_name)
 
 %ifdef MOTION_TYPE_ATTR1
     SET_JPOS_TPE(p_stat.open_id, pose_no, pose.MOTION_TYPE_ATTR1, status, RBT_GRP)

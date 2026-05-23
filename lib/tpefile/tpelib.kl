@@ -22,6 +22,7 @@ VAR
 
 %include tpe.private.klh
 %include tpe.klh
+%include tpe_hash.klh
 
 -- Define TPE dictionary file
 %class `TPE_DICTIONARY_FILENAME`('hash.klc','hashclass.klh','hash_tpeprog.klt')
@@ -62,8 +63,7 @@ ROUTINE tpe__open
     b : BOOLEAN
   BEGIN
     -- Open TPE program in read only
-    OPEN_TPE(TPE_name,TPE_RWACC, TPE_RDREJ, open_id, status)
-    
+    OPEN_TPE(TPE_name, TPE_RDACC, TPE_NOREJ, open_id, status)
     --check status, abort if nessecary
     CHK_STAT(status)
 
@@ -79,6 +79,8 @@ ROUTINE tpe__open
 
     b = `TPE_DICTIONARY_FILENAME`__put(TPE_name, p_stat, 'tpelib', 'prgm_stats')
     IF NOT b THEN karelError(INVALID_INDEX, 'Could not write '+ TPE_name + ' to "prgm_stats" in TPE', ER_ABORT) ; ENDIF
+
+    RETURN(open_id)
 
   END tpe__open 
 
@@ -181,7 +183,7 @@ ROUTINE tpe__sanitize_line
 
   END tpe__sanitize_line
 
-ROUTINE tpe__get_open_id
+ROUTINE tpe__get_tpeprogram
   VAR
     p_stat : TPEPROGRM
     b : BOOLEAN
@@ -193,6 +195,20 @@ ROUTINE tpe__get_open_id
     ENDIF
 
     RETURN(p_stat)
+  END tpe__get_tpeprogram
+
+  ROUTINE tpe__get_open_id
+  VAR
+    p_stat : TPEPROGRM
+    b : BOOLEAN
+  BEGIN
+    --see if file is already open
+    b = `TPE_DICTIONARY_FILENAME`__get(TPE_name, p_stat, 'tpelib', 'prgm_stats')
+    IF NOT b THEN
+      karelError(FILE_NOT_OPEN, TPE_name + ' is not open. use TPE__open to open file first.', ER_WARN)
+    ENDIF
+
+    RETURN(p_stat.open_id)
   END tpe__get_open_id
 
 ROUTINE tpe__copy

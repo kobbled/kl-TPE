@@ -39,6 +39,7 @@ VAR
   motion_list : PATH nodedata = t_MOTIONSTAT
   perch_pose : MOTION_DATA_JOINT_TYPE
   mod_perch : MOTION_DATA_JOINT_TYPE
+  open_id : INTEGER
 
 %include kunit.klh
 %from math.klh %import srand, rand_range
@@ -136,7 +137,7 @@ ROUTINE t_gettpepos
     --clear data
     clear_poses
 
-    tpe__open(TEST_TPP_PROGRAM)
+    open_id = tpe__open(TEST_TPP_PROGRAM)
 
     --get positions from TPE
     tsttpe__get_cart_poses(TEST_TPP_PROGRAM, cart_poses)
@@ -156,7 +157,7 @@ ROUTINE t_gettpepos
     tpe__copy(TEST_TPP_PROGRAM, COPY_TPP_PROGRAM)
 
 
-    tpe__open(COPY_TPP_PROGRAM)
+    open_id = tpe__open(COPY_TPP_PROGRAM)
 
     --add offset position to the new file
     set_tpe_poses(COPY_TPP_PROGRAM, cart_poses2, jnt_poses)
@@ -168,7 +169,7 @@ ROUTINE t_gettpepos
 
 ROUTINE t_setpos
   BEGIN
-    tpe__open(TEST_TPP_PROGRAM2)
+    open_id = tpe__open(TEST_TPP_PROGRAM2)
 
     perch_pose = tsttpe__get_joint_pose(TEST_TPP_PROGRAM2, 1)
     mod_perch = `MOTION_DATA_FILE`__new_joint(76.836, -6.150, -8.352, -157.122, 75.964, 102.112, 0)

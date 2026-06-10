@@ -30,7 +30,10 @@
     "test/test_tpe_pos.tpp"
   ],
   "tests-includes" : [
-    "test/configs"
+    "test/configs",
+    "C:/Users/MattDewar/OneDrive/OneDrive - Group Six Technologies Inc/Programing/git/G6-Templates/gst-envs/cell2",
+    "C:/Users/MattDewar/OneDrive/OneDrive - Group Six Technologies Inc/Programing/git/G6-Templates/gst-envs/shared",
+    "C:/Users/MattDewar/OneDrive/OneDrive - Group Six Technologies Inc/Programing/git/G6-Templates/fanuc-cell2/config"
   ],
   "tests-depends" : [
     "KUnit"
